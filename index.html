@@ -12,7 +12,8 @@
     <script>
       new Docute({
         target: '#docute',
-  title: 'Docute',
+      title: 'Docs',
+        
   nav: [
     {
       title: 'Home',
@@ -20,21 +21,29 @@
     },
     {
       title: 'GitHub',
-      link: 'https://github.com/egoist/docute'
-    },
-    // A dropdown menu
+      link: 'https://github.com/salmanfarooqui/docs'
+    }
+  ]
+        
+        sidebar: [
+    // A sidebar item, with child links
     {
-      title: 'Community',
+      title: 'JS',
       children: [
         {
-          title: 'Spectrum',
-          link: 'https://spectrum.chat/your-community'
+          title: 'Objects',
+          link: '/objects'
         },
         {
-          title: 'Discord',
-          link: 'https://discord.app/your-discord-server'
+          title: 'Event Loop',
+          link: '/loop'
         }
       ]
+    },
+    // An external link
+    {
+      title: 'Git',
+      link: '/git'
     }
   ]
 })
