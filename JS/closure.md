@@ -62,7 +62,7 @@ There can only be one currently running execution context (Because JavaScript is
 
 The currently running execution context will be always on the top of the stack, and when the function which is currently running completes, its execution context is popped off from the stack and the control reaches to the execution context below it in the stack.
 
-![img](https://miro.medium.com/max/1282/1*fYq9aQ9OMhO-THHrr7N54w.png)
+![img](http://docs.salmanfarooqui.com/JS/images/1*fYq9aQ9OMhO-THHrr7N54w.png)
 
 
 
