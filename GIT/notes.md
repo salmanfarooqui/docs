@@ -36,7 +36,7 @@ your local repository consists of three \"trees\" maintained by git. the first o
 
 
 
-![1588542059836](http://docs.salmanfarooqui.com/GIT/images/1588542059836.png)
+![1588542059836](https://docs.salmanfarooqui.com/GIT/images/1588542059836.png)
 
 
 
@@ -88,7 +88,7 @@ In Layman\'s term, it removes the git commit and git add and also the modified f
 
 
 
-![What_s_the_difference_between_HEAD_and_HEAD_in_Git_Stack_Overflow](http://docs.salmanfarooqui.com/GIT/images/What_s_the_difference_between_HEAD_and_HEAD_in_Git_Stack_Overflow.png)
+![What_s_the_difference_between_HEAD_and_HEAD_in_Git_Stack_Overflow](https://docs.salmanfarooqui.com/GIT/images/What_s_the_difference_between_HEAD_and_HEAD_in_Git_Stack_Overflow.png)
 
 
 
@@ -123,7 +123,7 @@ This differ from commit \--amend as:
 
 In Layman\'s term, it just removes git commit (not git add). Index remains the same. Moves the Head.
 
-![1588542387776](http://docs.salmanfarooqui.com/GIT/images/1588542387776.png)
+![1588542387776](https://docs.salmanfarooqui.com/GIT/images/1588542387776.png)
 
 
 
@@ -276,7 +276,7 @@ Example - first checkout to master branch. Then, git merege features master. fea
 > Let us assume that I created a branch named features. After working on this branch for a while (three commits), I finally decided that I am done and then I pushed it to my own remote. Meanwhile, nothing else happened in the master branch, it remained in the same state right before I branched off. Because master has not been changed since the commit, Git will perform the merge using fast-forward. The whole series of the commits will be linear.
 >
 
-![1588542726937](http://docs.salmanfarooqui.com/GIT/images/1588542726937.png)
+![1588542726937](https://docs.salmanfarooqui.com/GIT/images/1588542726937.png)
 
 > Another variant of the merge is to use -no-ff option (it stands for no fast-forward). In this case, the history looks slightly different (right side), there is an additional commit (dotted circle) emphasizing the merge. This commit even has the message informing us about the merged branch. The default behavior of Git is to use fast-forwarding whenever possible.
 >
@@ -291,7 +291,7 @@ merege (no fast forward)  `git merge tobemereged --no-ff tothisbranch`
 
 ## Rebase
 
-![1588542771450](http://docs.salmanfarooqui.com/GIT/images/1588542771450.png)
+![1588542771450](https://docs.salmanfarooqui.com/GIT/images/1588542771450.png)
 
 git-rebase: Reapply all the commit from your branch to the tip of another branch. By reapplying commits git creates new ones. Those new commits (E and F after rebase), even if they bring the same set of change will be treated as completely different and independent by git.
 
@@ -306,7 +306,7 @@ Let\'s say you\'re working on feature X and when you\'re done, you merge your ch
 
 For example - we want to integrate the changes from branch-B into branch-A
 
-![1588542806330](http://docs.salmanfarooqui.com/GIT/images/1588542806330.png)
+![1588542806330](https://docs.salmanfarooqui.com/GIT/images/1588542806330.png)
 
 Use -
 
@@ -324,7 +324,7 @@ This moves the entire branch-A to begin on the tip of the branch-B.
 
 First, Git will \"undo\" all commits on branch-A that happened after the lines began to branch. However, of course, it won\'t discard them: instead you can think of those commits as being \"saved away temporarily\".
 
-![1588542848716](http://docs.salmanfarooqui.com/GIT/images/1588542848716.png)
+![1588542848716](https://docs.salmanfarooqui.com/GIT/images/1588542848716.png)
 
 
 
@@ -332,7 +332,7 @@ First, Git will \"undo\" all commits on branch-A that happened after the lines b
 
 Next, it applies the commits from branch-B that we want to integrate. At this point, both branches look exactly the same.
 
-![1588542860818](http://docs.salmanfarooqui.com/GIT/images/1588542860818.png)
+![1588542860818](https://docs.salmanfarooqui.com/GIT/images/1588542860818.png)
 
 
 
@@ -340,7 +340,7 @@ Next, it applies the commits from branch-B that we want to integrate. At this po
 
 In the final step, the new commits on branch-A are now reapplied - but on a new position, on top of the integrated commits from branch-B (they are re-based). The result looks like development had happened in a straight line.
 
-![1588542882370](http://docs.salmanfarooqui.com/GIT/images/1588542882370.png)
+![1588542882370](https://docs.salmanfarooqui.com/GIT/images/1588542882370.png)
 
 
 
@@ -378,7 +378,7 @@ pick 5c67e61 Message for commit \#3
 
 When you save and close the file, Git will perform the rebase according to your instructions, resulting in project history that looks like the following:
 
-![1588542934162](http://docs.salmanfarooqui.com/GIT/images/1588542934162.png)
+![1588542934162](https://docs.salmanfarooqui.com/GIT/images/1588542934162.png)
 
 Eliminating insignificant commits like this makes your feature's history much easier to understand. This is something that git merge simply cannot do.
 
@@ -390,11 +390,11 @@ Keep in mind that it's perfectly legal to rebase onto a remote branch instead of
 
 For example, if you and another developer named John added commits to the feature branch, your repository might look like the following after fetching the remote feature branch from John's repository:
 
-![1588542968768](http://docs.salmanfarooqui.com/GIT/images/1588542968768.png)
+![1588542968768](https://docs.salmanfarooqui.com/GIT/images/1588542968768.png)
 
 You can resolve this fork the exact same way as you integrate upstream changes from master: either merge your local feature with john/feature, or rebase your local feature onto the tip of john/feature.
 
-![1588542981884](http://docs.salmanfarooqui.com/GIT/images/1588542981884.png)
+![1588542981884](https://docs.salmanfarooqui.com/GIT/images/1588542981884.png)
 
 Note that this rebase doesn't violate the Golden Rule of Rebasing because only your local feature commits are being moved---everything before that is untouched. This is like saying, "add my changes to what John has already done." In most circumstances, this is more intuitive than synchronizing with the remote branch via a merge commit.
 
