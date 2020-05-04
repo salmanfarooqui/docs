@@ -211,7 +211,7 @@ first();
 console.log('Inside Global Execution Context');
 ```
 
-![img](http://docs.salmanfarooqui.com/JS/images/1*ACtBy8CIepVTOSYcVwZ34Q.png)
+![img](http://docs.salmanfarooqui.com/JS/images/1_ACtBy8CIepVTOSYcVwZ34Q.png)
 
 
 
