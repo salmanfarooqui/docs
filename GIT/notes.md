@@ -36,7 +36,7 @@ your local repository consists of three \"trees\" maintained by git. the first o
 
 
 
-![1588542059836](C:\Users\Salman Farooqui\AppData\Roaming\Typora\typora-user-images\1588542059836.png)
+![1588542059836](http://docs.salmanfarooqui.com/GIT/images/1588542059836.png)
 
 
 
@@ -88,7 +88,7 @@ In Layman\'s term, it removes the git commit and git add and also the modified f
 
 
 
-![What_s_the_difference_between_HEAD_and_HEAD_in_Git_Stack_Overflow](./images/What_s_the_difference_between_HEAD_and_HEAD_in_Git_Stack_Overflow.png)
+![What_s_the_difference_between_HEAD_and_HEAD_in_Git_Stack_Overflow](http://docs.salmanfarooqui.com/GIT/images/What_s_the_difference_between_HEAD_and_HEAD_in_Git_Stack_Overflow.png)
 
 
 
