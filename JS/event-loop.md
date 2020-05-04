@@ -2,7 +2,7 @@
 
 Being single-threaded, JS creates the concept of event loop to run multiple tasks asynchronously. The event loop performs the function of constant monitoring of the message queue and the execution stack. The moment the execution stack becomes empty, the event loop lines up the first callback function on the execution stack.
 
-![img](http://docs.salmanfarooqui.com/JS/images/1*FA9NGxNB6-v1oI2qGEtlRQ.png)
+![img](http://docs.salmanfarooqui.com/JS/images/1_FA9NGxNB6-v1oI2qGEtlRQ.png)
 
 The Event Loop has one simple job — to monitor the Call Stack and the Callback Queue. If the Call Stack is empty, it will take the first event from the queue and will push it to the Call Stack, which effectively runs it.
 
@@ -39,7 +39,7 @@ console.log('Bye');
 
 How it runs -
 
-![img](http://docs.salmanfarooqui.com/JS/images/1*TozSrkk92l8ho6d8JxqF_w.gif)
+![img](http://docs.salmanfarooqui.com/JS/images/1_TozSrkk92l8ho6d8JxqF_w.gif)
 
 
 
