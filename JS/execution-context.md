@@ -14,9 +14,9 @@ Simply put, an execution context is an abstract concept of an environment where 
 
 The execution context is created in two phases: **1) Creation Phase** and **2) Execution Phase.**
 
-![Globals variables in the creation phase](https://tylermcginnis.com/images/posts/advanced-javascript/global-variables-in-creation-phase.png)
+![Globals variables in the creation phase](http://docs.salmanfarooqui.com/JS/images/global-variables-in-creation-phase.png)
 
-![Global variables in the execution phase](https://tylermcginnis.com/images/posts/advanced-javascript/global-variables-in-execution-phase.png)
+![Global variables in the execution phase](http://docs.salmanfarooqui.com/JS/images/global-variables-in-execution-phase.png)
 
 During creation phase, it sets up memory space for variables and functions.
 Assign variable declarations a default value of “undefined” while placing any function declarations in memory.
@@ -211,7 +211,7 @@ first();
 console.log('Inside Global Execution Context');
 ```
 
-![img](https://miro.medium.com/max/1800/1*ACtBy8CIepVTOSYcVwZ34Q.png)
+![img](http://docs.salmanfarooqui.com/JS/images/1*ACtBy8CIepVTOSYcVwZ34Q.png)
 
 
 
@@ -219,7 +219,7 @@ console.log('Inside Global Execution Context');
 
 We learned that variables created inside of a function are locally scoped and they can’t be (**for the most part**) accessed once the function’s Execution Context has been popped off the Execution Stack. It’s time to dive into that ”**for the most part**”. The one scenario where this isn’t true is if you have a function nested inside of another function. In this case, the child function will still have access to the outer function’s scope, even after the parent function’s Execution Context has been removed from the Execution Stack.
 
-![Visualizes closures](https://tylermcginnis.com/images/posts/advanced-javascript/closure-scope.gif)
+![Visualizes closures](http://docs.salmanfarooqui.com/JS/images/closure-scope.gif)
 
 Notice that after the `makeAdder` Execution Context has been popped off the Execution Stack, JavaScript Visualizer creates what’s called a `Closure Scope`. Inside of that `Closure Scope` is the same variable environment that existed in the `makeAdder` Execution Context. The reason this happened is because that we have a function nested inside of another function. In our example, the `inner` function is nested inside of the `makeAdder` function, so `inner` creates a `Closure` over the `makeAdder` variable environment. Even after the `makeAdder` Execution Environment has been popped off the Execution Stack, because that `Closure Scope` was created, `inner` has access to the `x` variable (via the Scope Chain).
 
