@@ -12,19 +12,19 @@ const element = (
 );
 ```
 
-
+<br><br>
 
 2. Since JSX is closer to JavaScript than to HTML, **React DOM uses `camelCase` property naming convention instead of HTML attribute names**.
 
    For example, `class` becomes [`className`](https://developer.mozilla.org/en-US/docs/Web/API/Element/className) in JSX, and `tabindex` becomes [`tabIndex`](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/tabIndex).
 
-
+<br><br>
 
 3. **Always start component names with a capital letter.**
 
 React treats components starting with lowercase letters as DOM tags. For example, <div /> represents an HTML div tag, but <Welcome /> represents a component and requires Welcome to be in scope.
 
-
+<br><br>
 
 4. Example
 
@@ -46,7 +46,7 @@ ReactDOM.render(
 - **React calls the `Welcome` component with `{name: 'Sara'}` as the props.**
 - Our `Welcome` component returns a `<h1>Hello, Sara</h1>` element as the result.
 
-
+<br><br>
 
 5. Whether you declare a component [as a function or a class](https://reactjs.org/docs/components-and-props.html#function-and-class-components), it must never modify its own props.
 
@@ -72,7 +72,7 @@ ReactDOM.render(
 
    **All React components must act like pure functions with respect to their props.**
 
-
+<br><br>
 
 6.  
 
@@ -102,7 +102,7 @@ ReactDOM.render(
      }
    ```
 
-
+<br><br>
 
 7.  React may batch multiple `setState()` calls into a single update for performance.
 
@@ -126,7 +126,7 @@ ReactDOM.render(
    }));
    ```
 
-
+<br><br>
 
 8. Handling events with React elements is very similar to handling events on DOM elements. There are some syntactic differences:
 
@@ -152,7 +152,7 @@ ReactDOM.render(
 
    Another difference is that you cannot return `false` to prevent default behavior in React. You must call `preventDefault` explicitly.
 
-   
+   <br><br>
 
 9. When you define a component using an [ES6 class](https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Classes), a common pattern is for an event handler to be a method on the class.
 
@@ -231,7 +231,7 @@ This is not React-specific behavior; it is a part of [how functions work in Java
 
 The problem with this syntax is that a different callback is created each time the `LoggingButton` renders. In most cases, this is fine. However, **if this callback is passed as a prop to lower components, those components might do an extra re-rendering**.
 
-
+<br><br>
 
 10. Inside a loop, it is common to want to pass an extra parameter to an event handler. For example, if `id` is the row ID, either of the following would work:
 
@@ -244,7 +244,7 @@ The problem with this syntax is that a different callback is created each time t
 
     In **both cases, the `e` argument representing the React event will be passed as a second argument after the ID**. With an arrow function, we have to pass it explicitly, but with `bind` any further arguments are automatically forwarded.
 
-    
+    <br><br>
 
 11. In rare cases you might want a component to hide itself even though it was rendered by another component. To do this return `null` instead of its render output.
 
@@ -291,30 +291,31 @@ The problem with this syntax is that a different callback is created each time t
 
     Returning `null` from a component’s `render` method does not affect the firing of the component’s lifecycle methods. For instance `componentDidUpdate` will still be called.
 
-    
+    <br><br>
 
 12. Keys help React identify which items have changed, are added, or are removed. Keys should be given to the elements inside the array to give the elements a stable identity:
 
-    
-
-    ```js
-    const numbers = [1, 2, 3, 4, 5];
-    const listItems = numbers.map((number) =>
-      <li key={number.toString()}>
-        {number}
-      </li>
-    );
-    ```
-
-    The best way to pick a key is to use a string that uniquely identifies a list item among its siblings. Most often you would use IDs from your data as keys.
-
-    When you don’t have stable IDs for rendered items, you may use the item index as a key as a last resort. We don’t recommend using indexes for keys if the order of items may change. This can negatively impact performance and may cause issues with component state.
-
-    **A good rule of thumb is that elements inside the `map()` call need keys.**
-
-    Keys serve as a hint to React but they don’t get passed to your components. If you need the same value in your component, pass it explicitly as a prop with a different name.
+```js
+const numbers = [1, 2, 3, 4, 5];
+const listItems = numbers.map((number) =>
+  <li key={number.toString()}>
+    {number}
+  </li>
+);
+```
 
 
+
+
+The best way to pick a key is to use a string that uniquely identifies a list item among its siblings. Most often you would use IDs from your data as keys.
+
+When you don’t have stable IDs for rendered items, you may use the item index as a key as a last resort. We don’t recommend using indexes for keys if the order of items may change. This can negatively impact performance and may cause issues with component state.
+
+**A good rule of thumb is that elements inside the `map()` call need keys.**
+
+Keys serve as a hint to React but they don’t get passed to your components. If you need the same value in your component, pass it explicitly as a prop with a different name.
+
+<br><br>
 
 13.   An input form element whose value is controlled by React in this way is called a “controlled component”.
 
@@ -389,7 +390,7 @@ handleInputChange(event) {
       </form>
 ```
 
-
+<br><br>
 
 14.  Some components don’t know their children ahead of time. We recommend that such components use the special `children` prop to pass children elements directly into their output:
 
@@ -454,16 +455,19 @@ Children passed to a custom component can be anything, as long as that component
 ### Default Export
 
 If you export as the default export like this,
+
 `export default class Template extends React.Component {}`
 
 
 
 Then in another file you import the default export without using the {}, like this,
+
 `import Template from './components/templates'`
 
 <br>
 
 There can only be one default export per file. You're free to rename the default export as you import it,
+
 `import TheTemplate from './components/templates'`
 
 
@@ -472,14 +476,17 @@ There can only be one default export per file. You're free to rename the default
 
 Exporting without default means it's a "named export". You can have multiple named exports in a single file.
 `export class Template extends React.Component  {}`
+
 `export class AnotherTemplate extends React.Component  {}`
 
 then you have to import these exports using their exact names.
+
 `import {Template, AnotherTemplate} from './components/templates'`
 
 <br>
 
 And you can import default and named exports at the same time,
+
 `import Template,{AnotherTemplate} from './components/templates'`
 
 
@@ -1110,7 +1117,7 @@ We use the HOC to create a new component like this:
 
 
 
-**Example -** 
+#### Example -
 
 Say we’re about to start work on our app’s user page. We know what our *User* object looks like, but we haven’t quite decided what kind of authorization we’d like to use.  We can start with a simple HOC function named `withUser`. We want this function to wrap around any component we pass to it and provide our User object as a prop.
 
@@ -1159,6 +1166,6 @@ For example, if you render a `<Modal />` component, the parent can capture its e
 
 Cheatsheet
 
-![React lifecycle methods diagram](C:\Users\Salman Farooqui\Desktop\React lifecycle methods diagram.png)
+![React lifecycle methods diagram](https://docs.salmanfarooqui.com/REACT/images/lifecycle-cheatsheet.png)
 
 ...
