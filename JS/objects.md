@@ -117,6 +117,220 @@ Usually a method needs to do something with the object it was called on. When a 
 
 
 
+All objects in JavaScript descend from the parent Object constructor. Object has many useful built-in methods we can use and access to make working with individual objects straightforward. Unlike Array prototype methods like sort() and reverse() that are used on the array instance, Object methods are used directly on the Object constructor, and use the object instance as a parameter. This is known as a static method.
+
+### Object.create()
+
+The Object.create() method is used to create a new object and link it to the prototype of an existing object.
+
+See more info see [Prototype section](/JS/objects#prototype)
+
+<br>
+
+<br>
+
+### Object.keys()
+
+Object.keys() creates an array containing the keys of an object.
+
+```js
+/ Initialize an object
+const employees = {
+    boss: 'Michael',
+    secretary: 'Pam',
+    sales: 'Jim',
+    accountant: 'Oscar'
+};
+
+// Get the keys of the object
+const keys = Object.keys(employees);
+
+console.log(keys);
+// Output["boss", "secretary", "sales", "accountant"]
+```
+
+<br>
+
+Object.keys can be used to iterate through the keys and values of an object.
+
+```js
+// Iterate through the keys
+Object.keys(employees).forEach(key => {
+    let value = employees[key];
+     console.log(`${key}: ${value}`);
+});
+
+// Outputboss: Michael
+// secretary: Pam
+// sales: Jim
+// accountant: Oscar
+```
+
+<br>
+
+Object.keys is also useful for checking the length of an object.
+
+```js
+// Get the length of the keys
+const length = Object.keys(employees).length;
+
+console.log(length);
+// 4
+```
+
+<br>
+
+### Object.values()
+
+Object.values() creates an array containing the values of an object.
+
+```js
+const session = {
+    id: 1,
+    time: `26-July-2018`,
+    device: 'mobile',
+    browser: 'Chrome'
+};
+
+// Get all values of the object
+const values = Object.values(session);
+
+console.log(values);
+// [1, "26-July-2018", "mobile", "Chrome"]
+```
+
+<br>
+
+### Object.entries()
+
+Object.entries() creates a nested array of the key/value pairs of an object.
+
+```js
+const operatingSystem = {
+    name: 'Ubuntu',
+    version: 18.04,
+    license: 'Open Source'
+};
+
+// Get the object key/value pairs
+const entries = Object.entries(operatingSystem);
+
+console.log(entries);
+
+ // [
+ //   ["name", "Ubuntu"]
+ //   ["version", 18.04]
+ //   ["license", "Open Source"]
+ // ]
+```
+
+<br>
+
+Once we have the key/value pair arrays, we can use the `forEach()` method to loop through and work with the results.
+
+```js
+entries.forEach(entry => {
+    let key = entry[0];
+    let value = entry[1];
+
+    console.log(`${key}: ${value}`);
+});
+
+// Outputname: Ubuntu
+// version: 18.04
+// license: Open Source
+```
+
+<br>
+
+### Object.assign()
+
+You can create a shallow copy i.e. a top level properties copy, using Objects.assign() method. Object.assign() is used to copy values from one object to another.
+
+We can create two objects, and merge them with `Object.assign()`.
+
+```js
+const name = {
+    firstName: 'Philip',
+    lastName: 'Fry'
+};
+
+const details = {
+    job: 'Delivery Boy',
+    employer: 'Planet Express'
+};
+
+// Merge the objects
+const character = Object.assign(name, details);
+
+console.log(character);
+
+// {firstName: "Philip", lastName: "Fry", job: "Delivery Boy", employer: "Planet Express"}
+```
+
+It is also possible to use the spread operator (`...`) to accomplish the same task. `const character = {...name, ...details}`
+
+For for info see [Value vs Reference section](/JS/objects#copying-objects-and-arrays)
+
+<br>
+
+### Object.freeze()
+
+Object.freeze() prevents modification to properties and values of an object, and prevents properties from being added or removed from an object.
+
+```js
+const user = {
+    username: 'AzureDiamond',
+    password: 'hunter2'
+};
+
+// Freeze the object
+const newUser = Object.freeze(user);
+
+newUser.password = '*******';
+newUser.active = true;
+
+console.log(newUser);
+
+// {username: "AzureDiamond", password: "hunter2"}
+```
+
+In the example above, we tried to override the password hunter2 with *******, but the password property remained the same.  `Object.isFrozen()` is available to determine whether an object has been frozen or not, and returns a Boolean.
+
+<br>
+
+### Object.seal()
+
+[`Object.seal()`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/seal) prevents new properties from being added to an object, but allows the modification of existing properties.
+
+<br>
+
+### Object.getPrototypeOf()
+
+Object.getPrototypeOf() is used to get the internal hidden [[Prototype]] of an object, also accessible through the `_proto_` property.
+
+In this example, we can create an array, which has access to the `Array` prototype.
+
+```js
+const employees = ['Ron', 'April', 'Andy', 'Leslie'];
+Object.getPrototypeOf(employees);
+
+// [constructor: ƒ, concat: ƒ, find: ƒ, findIndex: ƒ, pop: ƒ, …]
+```
+
+We can see in the output that the prototype of the `employees` array has access to `pop`, `find`, and other Array prototype methods. We can confirm this by testing the `employees` prototype against `Array.prototype`.
+
+```js
+Object.getPrototypeOf(employees) === Array.prototype;
+// true
+```
+
+This method can be useful to get more information about an object or ensure it has access to the prototype of another object.
+
+> There is also a related `Object.setPrototypeOf()` method that will add one prototype to another object. It is recommended that you use `Object.create()` instead as it is faster and more performant.
+
+
+
 ## Prototype
 
 ```js
