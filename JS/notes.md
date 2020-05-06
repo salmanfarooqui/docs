@@ -1358,3 +1358,18 @@ class Counter extends Component {
 
 
 
+## JS Links
+
+[Re-Introduction to JavaScript](https://developer.mozilla.org/en-US/docs/Web/JavaScript/A_re-introduction_to_JavaScript) - basic JS overview from mozilla developer network(mdn)
+
+[33 JS Concepts](https://github.com/leonardomso/33-js-concepts) - important js concepts everyone should know
+
+[JS Cheatsheet](http://overapi.com/javascript) - all api's in one place
+
+<br>
+
+[ES6 Features list](http://es6-features.org/#Constants) - conatins examples with comparison to es5
+
+[ES6 Cheatsheet](https://devhints.io/es6) - by devhints.io
+
+[ES6](https://www.freecodecamp.org/news/write-less-do-more-with-javascript-es6-5fd4a8e50ee2/) - important es6 concepts explained by freecodecamp
