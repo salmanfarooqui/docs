@@ -1,6 +1,6 @@
 # Notes
 
-## JS Arguements
+## JS Arguments
 
 ### Arguments are Passed by Value
 
@@ -18,9 +18,49 @@ Changes to object properties are visible (reflected) outside the function.
 
 
 
+## Coercion
+
+Converting a value from one type to another by JS engine automatically.
+
+```js
+var a = 1 + 2;  // 3
+var a = 'hello ' + 'world';  // hello world
+
+// But if we pass two different types to addition operator. 
+var a = 1 + '2';  // 12
+```
+
+Here first value was coerced by JavaScript into a string.
+
+
+
+**Example -**
+
+```js
+console.log(3 < 2 < 1);
+// true
+```
+
+why is this true? 
+
+first 3 < 2 runs and resolves to false. Then, false < 1 runs. Because they are two different types, coercion happens and false gets converted to 0, so it runs 0 < 1, which is true.
+
+> == operator coerce the types. so `3 == 3 // true` and `"3" == 3 // true`. If you don't want that use strict equality operator ===
+
+<br>
+
+```js
+Boolean(undefined); // false
+Boolean(null); //false
+Boolean(""); //false
+Boolean(0); //false
+```
+
+
+
 ## Diff between JSON and Object Literal
 
-Object literal may or maynot have quotes around keys. Example -
+Object literal may or may not have quotes around keys. Example -
 
 ```js
 var something = {
