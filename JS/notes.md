@@ -976,6 +976,87 @@ When JavaScript executes this code it does 4 things:
 
 this is because when JavaScript executed this code it searched for car property on b, it did not find then JavaScript used b.\__proto__ (which was made to point to 'a.prototype' in step#2) and finds car property so return "BMW".
 
+<br>
+
+```js
+var a = {};
+var b = function() { };
+var c = [];
+
+a.__proto__
+ // {
+ // constructor: ƒ Object()
+ // hasOwnProperty: ƒ hasOwnProperty()
+ // isPrototypeOf: ƒ isPrototypeOf()
+ // propertyIsEnumerable: ƒ propertyIsEnumerable()
+ // toLocaleString: ƒ toLocaleString()
+ // toString: ƒ toString()
+ // valueOf: ƒ valueOf()
+ // get __proto__: ƒ __proto__()
+ // set __proto__: ƒ __proto__()
+ // }
+
+a.__proto__.__proto__
+ // null
+
+
+b.__proto__
+ // f() { [native code]}
+
+b.__proto__.__proto__
+ // {
+ // constructor: ƒ Object()
+ // hasOwnProperty: ƒ hasOwnProperty()
+ // isPrototypeOf: ƒ isPrototypeOf()
+ // propertyIsEnumerable: ƒ propertyIsEnumerable()
+ // toLocaleString: ƒ toLocaleString()
+ // toString: ƒ toString()
+ // valueOf: ƒ valueOf()
+ // get __proto__: ƒ __proto__()
+ // set __proto__: ƒ __proto__()
+ // }
+
+b.__proto__.__proto__.__proto__
+ // null
+
+
+c.__proto__
+ // [
+ // concat: ƒ concat()
+ // constructor: ƒ Array()
+ // copyWithin: ƒ copyWithin()
+ // entries: ƒ entries()
+ // every: ƒ every()
+ // find: ƒ find()
+ /// length: 0
+ // map: ƒ map()
+ // push: ƒ push()
+ // reduce: ƒ reduce()
+ // ...
+ // values: ƒ values()
+ // Symbol(Symbol.iterator): ƒ values()
+ // __proto__: Object
+ // ]
+
+c.__proto__.__proto__
+ // {
+ // constructor: ƒ Object()
+ // hasOwnProperty: ƒ hasOwnProperty()
+ // isPrototypeOf: ƒ isPrototypeOf()
+ // propertyIsEnumerable: ƒ propertyIsEnumerable()
+ // toLocaleString: ƒ toLocaleString()
+ // toString: ƒ toString()
+ // valueOf: ƒ valueOf()
+ // get __proto__: ƒ __proto__()
+ // set __proto__: ƒ __proto__()
+ // }
+
+c.__proto__.__proto__.__proto__
+ // null
+```
+
+The methods that we use like toString are not on our function but rather they are on the prototype. When JS Engine couldn't find it in our function it looks up on it's prototype and if it's not there too it looks on it's prototype's prototype and so on. 
+
 
 
 ## Callback Functions
@@ -1413,3 +1494,6 @@ class Counter extends Component {
 [ES6 Cheatsheet](https://devhints.io/es6) - by devhints.io
 
 [ES6](https://www.freecodecamp.org/news/write-less-do-more-with-javascript-es6-5fd4a8e50ee2/) - important es6 concepts explained by freecodecamp
+
+[ES6](https://github.com/DrkSephy/es6-cheatsheet) - cheatsheet containing tips, tricks, best practices from DrkSephy/es6-cheatsheet on github
+
