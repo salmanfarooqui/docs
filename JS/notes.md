@@ -898,10 +898,131 @@ map, on the other hand, does have a restriction on the operation: it expects the
 
 
 
-## \__proto__ VS. prototype in JavaScript
+## \__proto__ vs prototype in JavaScript
 
-prototype is a property of a Function object. It is the prototype of objects constructed by that function. 
-\_proto__ is internal property of an object, pointing to its prototype. prototype is the object that is used to build \_proto__ when you create an object with new. Current standards provide an equivalent Object.getPrototypeOf(O) method. 
+When a function is created in JavaScript, the JavaScript engine adds a `prototype` property to the function. This `prototype` property is an object (called a prototype object) that has a `constructor` property by default.   The `constructor` property points back to the function on which `prototype` object is a property. We can access the function’s prototype property using `functionName.prototype`.
+
+![1_15Qo3ab3NPkLfXpj5AncaQ](https://docs.salmanfarooqui.com/JS/images/1_15Qo3ab3NPkLfXpj5AncaQ.png)
+
+
+
+In other words, `prototype` is a property of a Function object. It is the prototype of objects constructed by that function.
+
+<br>
+
+`__proto__` is internal property of an object, pointing to its prototype. Current standards provide an equivalent `Object.getPrototypeOf(O)` method, though de facto standard `__proto__` is quicker.
+
+<br>
+
+> `__proto__` is the actual object that is used in the lookup chain to resolve methods, etc.
+>
+> `prototype` is the object that is used to build `__proto__` when you create an object with `new`
+
+<br>
+
+```js
+var a = {};
+var b = function() { };
+var c = [];
+
+a.__proto__
+ // {
+ // constructor: ƒ Object()
+ // hasOwnProperty: ƒ hasOwnProperty()
+ // isPrototypeOf: ƒ isPrototypeOf()
+ // propertyIsEnumerable: ƒ propertyIsEnumerable()
+ // toLocaleString: ƒ toLocaleString()
+ // toString: ƒ toString()
+ // valueOf: ƒ valueOf()
+ // get __proto__: ƒ __proto__()
+ // set __proto__: ƒ __proto__()
+ // }
+
+a.__proto__.__proto__
+ // null
+
+---------------------------------------------
+
+b.__proto__
+ // f() { [native code]}
+
+b.__proto__.__proto__
+ // {
+ // constructor: ƒ Object()
+ // hasOwnProperty: ƒ hasOwnProperty()
+ // isPrototypeOf: ƒ isPrototypeOf()
+ // propertyIsEnumerable: ƒ propertyIsEnumerable()
+ // toLocaleString: ƒ toLocaleString()
+ // toString: ƒ toString()
+ // valueOf: ƒ valueOf()
+ // get __proto__: ƒ __proto__()
+ // set __proto__: ƒ __proto__()
+ // }
+
+b.__proto__.__proto__.__proto__
+ // null
+
+b.prototype
+ // {
+ // constructor: ƒ ()
+ /// __proto__: Object
+ // }
+
+b.prototype.constructor
+ // ƒ () {}
+b.prototype.__proto__
+ // {
+ // constructor: ƒ Object()
+ // hasOwnProperty: ƒ hasOwnProperty()
+ // isPrototypeOf: ƒ isPrototypeOf()
+ // propertyIsEnumerable: ƒ propertyIsEnumerable()
+ // toLocaleString: ƒ toLocaleString()
+ // toString: ƒ toString()
+ // valueOf: ƒ valueOf()
+ // get __proto__: ƒ __proto__()
+ // set __proto__: ƒ __proto__()
+ // }
+
+--------------------------------------------
+
+c.__proto__
+ // [
+ // concat: ƒ concat()
+ // constructor: ƒ Array()
+ // copyWithin: ƒ copyWithin()
+ // entries: ƒ entries()
+ // every: ƒ every()
+ // find: ƒ find()
+ /// length: 0
+ // map: ƒ map()
+ // push: ƒ push()
+ // reduce: ƒ reduce()
+ // ...
+ // values: ƒ values()
+ // Symbol(Symbol.iterator): ƒ values()
+ // __proto__: Object
+ // ]
+
+c.__proto__.__proto__
+ // {
+ // constructor: ƒ Object()
+ // hasOwnProperty: ƒ hasOwnProperty()
+ // isPrototypeOf: ƒ isPrototypeOf()
+ // propertyIsEnumerable: ƒ propertyIsEnumerable()
+ // toLocaleString: ƒ toLocaleString()
+ // toString: ƒ toString()
+ // valueOf: ƒ valueOf()
+ // get __proto__: ƒ __proto__()
+ // set __proto__: ƒ __proto__()
+ // }
+
+c.__proto__.__proto__.__proto__
+ // null
+```
+
+The methods that we use like toString are not on our function but rather they are on the prototype. When JS Engine couldn't find it in our function it looks up on it's prototype and if it's not there too it looks on it's prototype's prototype and so on. 
+
+<br>
 
 When creating a function, a property object called prototype is being created automatically (you didn't create it yourself) and is being attached to the function object (the constructor)
 
@@ -976,86 +1097,7 @@ When JavaScript executes this code it does 4 things:
 
 this is because when JavaScript executed this code it searched for car property on b, it did not find then JavaScript used b.\__proto__ (which was made to point to 'a.prototype' in step#2) and finds car property so return "BMW".
 
-<br>
 
-```js
-var a = {};
-var b = function() { };
-var c = [];
-
-a.__proto__
- // {
- // constructor: ƒ Object()
- // hasOwnProperty: ƒ hasOwnProperty()
- // isPrototypeOf: ƒ isPrototypeOf()
- // propertyIsEnumerable: ƒ propertyIsEnumerable()
- // toLocaleString: ƒ toLocaleString()
- // toString: ƒ toString()
- // valueOf: ƒ valueOf()
- // get __proto__: ƒ __proto__()
- // set __proto__: ƒ __proto__()
- // }
-
-a.__proto__.__proto__
- // null
-
-
-b.__proto__
- // f() { [native code]}
-
-b.__proto__.__proto__
- // {
- // constructor: ƒ Object()
- // hasOwnProperty: ƒ hasOwnProperty()
- // isPrototypeOf: ƒ isPrototypeOf()
- // propertyIsEnumerable: ƒ propertyIsEnumerable()
- // toLocaleString: ƒ toLocaleString()
- // toString: ƒ toString()
- // valueOf: ƒ valueOf()
- // get __proto__: ƒ __proto__()
- // set __proto__: ƒ __proto__()
- // }
-
-b.__proto__.__proto__.__proto__
- // null
-
-
-c.__proto__
- // [
- // concat: ƒ concat()
- // constructor: ƒ Array()
- // copyWithin: ƒ copyWithin()
- // entries: ƒ entries()
- // every: ƒ every()
- // find: ƒ find()
- /// length: 0
- // map: ƒ map()
- // push: ƒ push()
- // reduce: ƒ reduce()
- // ...
- // values: ƒ values()
- // Symbol(Symbol.iterator): ƒ values()
- // __proto__: Object
- // ]
-
-c.__proto__.__proto__
- // {
- // constructor: ƒ Object()
- // hasOwnProperty: ƒ hasOwnProperty()
- // isPrototypeOf: ƒ isPrototypeOf()
- // propertyIsEnumerable: ƒ propertyIsEnumerable()
- // toLocaleString: ƒ toLocaleString()
- // toString: ƒ toString()
- // valueOf: ƒ valueOf()
- // get __proto__: ƒ __proto__()
- // set __proto__: ƒ __proto__()
- // }
-
-c.__proto__.__proto__.__proto__
- // null
-```
-
-The methods that we use like toString are not on our function but rather they are on the prototype. When JS Engine couldn't find it in our function it looks up on it's prototype and if it's not there too it looks on it's prototype's prototype and so on. 
 
 
 
