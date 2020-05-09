@@ -18,6 +18,10 @@ For single repository, use `git config user.name "Mona Lisa"`
 
 Email - `git config --global user.email "email@example.com"`
 
+<br>
+
+*`use git config --list` to list all configuration*
+
 
 
 ### Step 3

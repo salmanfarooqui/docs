@@ -179,3 +179,18 @@ foo()
 ```
 
 That’s a big difference between Promises (and async/await, which is built on promises) and plain old asynchronous functions through `setTimeout()` or other platform APIs.
+
+
+
+## Video
+
+[![Event Loop ](https://img.youtube.com/vi/8aGhZQkoFbQ/0.jpg)](https://www.youtube.com/watch?v=8aGhZQkoFbQ)
+
+What the heck is the event loop anyway? | Philip Roberts | JSConf
+
+<br>
+
+
+[![Event Loop ](https://img.youtube.com/vi/cCOL7MC4Pl0/0.jpg)](https://www.youtube.com/watch?v=cCOL7MC4Pl0?t=431)
+
+Jake Archibald: In The Loop - JSConf.Asia

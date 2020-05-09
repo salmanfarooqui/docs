@@ -333,6 +333,10 @@ This method can be useful to get more information about an object or ensure it h
 
 ## Prototype
 
+> Inheritance - One object gets access to the properties and methods of another object
+
+
+
 ```js
 let empty = {};
 console.log(empty.toString);

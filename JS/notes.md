@@ -1097,7 +1097,9 @@ When JavaScript executes this code it does 4 things:
 
 this is because when JavaScript executed this code it searched for car property on b, it did not find then JavaScript used b.\__proto__ (which was made to point to 'a.prototype' in step#2) and finds car property so return "BMW".
 
+<br>
 
+More info - [Prototypes in JavaScript](https://medium.com/better-programming/prototypes-in-javascript-5bba2990e04b) on medium
 
 
 
