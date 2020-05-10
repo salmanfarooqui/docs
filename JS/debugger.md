@@ -2,7 +2,7 @@
 
 In `hello.js`, click at line number `4` and `8`.  Congratulations! You’ve set a breakpoint. 
 
-![debugging01](C:\Users\Salman Farooqui\Documents\Docs\JS\images\debugging01.png)
+![debugging01](https://docs.salmanfarooqui.com/JS/images/debugging01.png)
 
 A *breakpoint* is a point of code where the debugger will automatically pause the JavaScript execution.
 
@@ -24,7 +24,7 @@ That’s very convenient when we are in a code editor and don’t want to switch
 
 `hello()` is called during the page load, so the easiest way to activate the debugger (after we’ve set the breakpoints) is to reload the page. As the breakpoint is set, the execution pauses at the 4th line.
 
-![debugger02](C:\Users\Salman Farooqui\Documents\Docs\JS\images\debugger02.png)
+![debugger02](https://docs.salmanfarooqui.com/JS/images/debugger02.png)
 
 
 
@@ -56,7 +56,7 @@ continue the execution, hotkey F8.
 
 Resumes the execution. If there are no additional breakpoints, then the execution just continues and the debugger loses control.
 
-![debugger03](C:\Users\Salman Farooqui\Documents\Docs\JS\images\debugger03.png)
+![debugger03](https://docs.salmanfarooqui.com/JS/images/debugger03.png)
 
 
 
@@ -104,7 +104,7 @@ Continue the execution and stop it at the very last line of the current function
 
 That button does not move the execution. Just a mass on/off for breakpoints. 
 
-### || 
+### || (pause on exception)
 
 enable/disable automatic pause in case of an error.
 
