@@ -30,7 +30,18 @@ That’s very convenient when we are in a code editor and don’t want to switch
 
 1. **`Watch` – shows current values for any expressions.**
 
-   You can click the plus `+` and input an expression. The debugger will show its value at any moment, automatically recalculating it in the process of execution.
+   The **Watch Expressions** tab lets you monitor the values of variables over time. Watch Expressions aren't just limited to variables. You can store any valid JavaScript expression in a Watch Expression. 
+
+   1. Click the **Watch** tab.
+   2. Click **Add Expression** ![Add Expression](https://developers.google.com/web/tools/chrome-devtools/javascript/imgs/add-expression.png).
+   3. Type `typeof sum`.
+   4. Press Enter. DevTools shows `typeof sum: "string"`. The value to the right of the colon is the result of your Watch Expression.
+
+   
+
+   ![debugger02](https://docs.salmanfarooqui.com/JS/images/debugger04.png)
+
+   
 
 2. **`Call Stack` – shows the nested calls chain.**
 
