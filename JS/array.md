@@ -822,6 +822,16 @@ Tips:
 
 
 
+## map vs forEach
+
+The important difference between them is that **map accumulates all of the results into a collection**, whereas **foreach returns nothing**. map is usually used when you want to transform a collection of elements with a function, whereas foreach simply executes an action for each element. In short, foreach is for applying an operation on each element of a collection of elements, whereas map is for transforming one collection into another.
+
+foreach has no conceptual restrictions on the operation it applies, other than perhaps accept an element as argument. That is, the operation may do nothing, may have a side-effect, may return a value or may not return a value. All foreach cares about is to iterate over a collection of elements, and apply the operation on each element.
+
+map, on the other hand, does have a restriction on the operation: it expects the operation to return an element.
+
+
+
 ## CheatSheet
 
 

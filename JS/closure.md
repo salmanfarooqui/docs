@@ -202,7 +202,7 @@ The engine finds the variable, prints it to the console and will increment the c
 
 So the lexical environment for the `getCounter` function after first call `count` function will look like this:
 
-```
+```js
 getCounterLexicalEnvironment = {
   environmentRecord: {
     counter: 1,
@@ -212,3 +212,6 @@ getCounterLexicalEnvironment = {
 }
 ```
 
+
+
+> Closure makes it possible for a function to have "**private**" variables. Like in Example 2, counter is a private variable to getCounter function. counter is protected by the scope of the anonymous function, and can only be changed using the count function.

@@ -184,7 +184,185 @@ return (
 
 > function() itself returns last evaluated value even without including return. But it's a good practice to use return statement.
 
-## Arrow functions
+
+
+## IIFE
+
+IIFE (Immediately Invoked Function Expression) is a JavaScript function that runs as soon as it is defined.
+
+```javascript
+function generateMagicNumber() {
+    return Math.floor(Math.random() * 100) + 900;
+}
+console.log("magic no: " + generateMagicNumber());
+var favoriteNumber = 5;
+```
+
+If we load other JavaScript codes in our browser, they also gain access to generateMagicNumber() and favoriteNumber. To prevent them from using or editing them
+
+```javascript
+(function () {
+    function generateMagicNumber() {
+        return Math.floor(Math.random() * 100) + 900;
+    }
+    console.log("magic no: " + generateMagicNumber());
+    var favoriteNumber = 5;
+})();
+```
+
+It runs the same, but now generateMagicNumber() and favoriteNumber are only accessible within. It won't create any global variable and **your global namespace will not be polluted**. 
+
+
+### Asynchronous Functions in Loops
+
+JavaScript's behavior surprises many when callbacks are executed in loops. For example, let's count from 1 to 5 in JavaScript, putting a 1 second gap between every time we log a message. A naïve implementation would be -
+
+```javascript
+for (var i = 1; i <= 5; i++) {
+    setTimeout(function () {
+        console.log('I reached step ' + i);
+    }, 1000 * i);
+}
+// I reached step 6
+// I reached step 6
+// I reached step 6
+// I reached step 6
+// I reached step 6
+```
+
+While the output would be printed 1 second after the other, each line prints that they reached step 6. Why?
+
+When JavaScript encounters asynchronous code, it defers execution of the callback until the asynchronous task completes. In this example, the `console.log()` statement will run only after the timeout has elapsed.
+
+JavaScript also created a **closure** for our callback.  With closures, our callback can access the variable `i` even though the `for` loop has already finished executing. However, our callback only has access to the value of `i` **at the time of its execution**. As the code within the `setTimeout()` function were all deferred, the `for` loop was finished with `i` being equal to 6.
+
+
+
+*This problem can be solved with an IIFE -* 
+
+```javascript
+for (var i = 1; i <= 5; i++) {
+    (function (step) {
+        setTimeout(function() {
+            console.log('I reached step ' + step);
+        }, 1000 * i);
+    })(i);
+}
+// I reached step 1
+// I reached step 2
+// I reached step 3
+// I reached step 4
+// I reached step 5
+```
+
+By using an IIFE, we create a new scope for our callback function. Our IIFE takes a parameter `step`. Every time our IIFE is called, we give it the current value of `i` as its argument. Now, when the callback is ready to be executed, its closure will have the correct value of `step`.
+
+
+
+> If you have 2 libraries that export an object with the same name, you can use IIFEs to ensure they don't conflict in your code. For example, the [jQuery](https://jquery.com/) and [Cash](https://kenwheeler.github.io/cash/) JavaScript libraries both export `$` as their main object. Let's say, we want to ensure that `$` refers to the `jQuery` object, and not the `cash` alternative. 
+>
+> ```javascript
+> (function($) {
+>     // Code that runs in your function
+> })(jQuery);
+> ```
+
+
+
+## classes
+
+Classes are in fact "special functions", and just as you can define function expressions and function declarations, the class syntax has two components: class expressions and class declarations.
+
+### Class declaration
+
+```js
+class Rectangle {
+  constructor(height, width) {
+    this.height = height;
+    this.width = width;
+  }
+}
+```
+
+An important difference between function declarations and class declarations is that **function declarations are hoisted and class declarations are not**. You first need to declare your class and then access it, otherwise code like the following will throw a ReferenceError:
+
+```js
+const p = new Rectangle(); // ReferenceError
+class Rectangle {}
+```
+
+
+
+### Class expression
+
+Class expressions can be named or unnamed. The name given to a named class expression is local to the class's body. (it can be retrieved through the class's (not an instance's) [`name`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function/name) property, though).
+
+```js
+// unnamed
+let Rectangle = class {
+  constructor(height, width) {
+    this.height = height;
+    this.width = width;
+  }
+};
+console.log(Rectangle.name);
+// output: "Rectangle"
+
+// named
+let Rectangle = class Rectangle2 {
+  constructor(height, width) {
+    this.height = height;
+    this.width = width;
+  }
+};
+console.log(Rectangle.name);
+// output: "Rectangle2"
+```
+
+
+
+### Constructor
+
+The `constructor` method is a special method **for creating and initializing** an object created with a `class`. In other words, the properties are created and initialized inside a `constructor()` method. There can only be one special method with the name "constructor" in a class. The constructor method is called each time the class object is initialized. A constructor can use the `super` keyword to call the constructor of the super class.
+
+
+
+### Extends
+
+The `extends` keyword is used in *class declarations* or *class expressions* to create a class as a child of another class.
+
+```js
+class Animal { 
+  constructor(name) {
+    this.name = name;
+  }
+  speak() {
+    console.log(`${this.name} makes a noise.`);
+  }
+}
+
+class Dog extends Animal {
+  constructor(name) {
+    super(name); // call the super class constructor and pass in the name parameter
+  }
+  speak() {
+    console.log(`${this.name} barks.`);
+  }
+}
+
+let d = new Dog('Mitzie');
+d.speak(); // Mitzie barks.
+```
+
+If there is a constructor present in the subclass, it needs to **first call super() before using "this"**.
+
+
+
+<br>
+
+<br>
+
+Arrow functions
 
 pure functions
 

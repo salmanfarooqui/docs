@@ -99,6 +99,54 @@ delete person.age;   // or delete person["age"];
 
 
 
+### Looping through properties
+
+`for...in` loops - This method traverses all **enumerable** properties of an object and its prototype chain
+
+To find out if an object has a specific property as one of its own property, you use the `hasOwnProperty` method. This method is very useful because from time to time you need to enumerate an object and you want only the own properties, not the inherited ones.
+
+```js
+var school = {schoolName:"MIT"};
+console.log(school.hasOwnProperty ("schoolName"));  // true
+```
+
+##### Enumerable
+
+If you create an object via `myObj = {foo: 'bar'}` or something thereabouts, all properties are enumerable. So what's not enumerable? Certain objects have some non-enumerable properties, for example if you call `Object.getOwnPropertyNames([])` (which returns an array of all properties, enumerable or not, on []), it will return `['length']`, which includes the non-enumerable property of an array, 'length'.
+
+<br>
+
+You can create your own non-enumerable properties using the `Object.defineProperty` method:
+
+```js
+  var car = {
+    make: 'Honda',
+    model: 'Civic',
+    year: '2008',
+    condition: 'bad',
+    mileage: 36000
+  };
+
+  Object.defineProperty(car, 'mySecretAboutTheCar', {
+    value: 'cat pee in back seat',
+    enumerable: false
+  });
+```
+
+Now, the fact that there is even a secret about the car is hidden. Of course they can still access the property directly and get the answer:
+
+```js
+console.log(car.mySecretAboutTheCar); // prints 'cat pee in back seat'
+```
+
+But, they would have to know that the property exists first, because if they're trying to access it through `for..in` or `Object.keys` it will remain completely secret.
+
+```js
+console.log(Object.keys(car)); //prints ['make', 'model', 'year', 'condition', 'mileage']
+```
+
+
+
 ## Methods
 
 Methods are nothing more than properties that hold function values. This is a simple method:
@@ -576,6 +624,211 @@ Class allows you to create a blueprint for an object. Then whenever you create a
 
 
 
+### \__proto__ vs prototype in JavaScript
+
+When a function is created in JavaScript, the JavaScript engine adds a `prototype` property to the function. This `prototype` property is an object (called a prototype object) that has a `constructor` property by default.   The `constructor` property points back to the function on which `prototype` object is a property. We can access the function’s prototype property using `functionName.prototype`.
+
+![1_15Qo3ab3NPkLfXpj5AncaQ](https://docs.salmanfarooqui.com/JS/images/1_15Qo3ab3NPkLfXpj5AncaQ.png)
+
+
+
+In other words, `prototype` is a property of a Function object. It is the prototype of objects constructed by that function.
+
+<br>
+
+`__proto__` is internal property of an object, pointing to its prototype. Current standards provide an equivalent `Object.getPrototypeOf(O)` method, though de facto standard `__proto__` is quicker.
+
+<br>
+
+> `__proto__` is the actual object that is used in the lookup chain to resolve methods, etc.
+>
+> `prototype` is the object that is used to build `__proto__` when you create an object with `new`
+
+<br>
+
+```js
+var a = {};
+var b = function() { };
+var c = [];
+
+a.__proto__
+ // {
+ // constructor: ƒ Object()
+ // hasOwnProperty: ƒ hasOwnProperty()
+ // isPrototypeOf: ƒ isPrototypeOf()
+ // propertyIsEnumerable: ƒ propertyIsEnumerable()
+ // toLocaleString: ƒ toLocaleString()
+ // toString: ƒ toString()
+ // valueOf: ƒ valueOf()
+ // get __proto__: ƒ __proto__()
+ // set __proto__: ƒ __proto__()
+ // }
+
+a.__proto__.__proto__
+ // null
+
+---------------------------------------------
+
+b.__proto__
+ // f() { [native code]}
+
+b.__proto__.__proto__
+ // {
+ // constructor: ƒ Object()
+ // hasOwnProperty: ƒ hasOwnProperty()
+ // isPrototypeOf: ƒ isPrototypeOf()
+ // propertyIsEnumerable: ƒ propertyIsEnumerable()
+ // toLocaleString: ƒ toLocaleString()
+ // toString: ƒ toString()
+ // valueOf: ƒ valueOf()
+ // get __proto__: ƒ __proto__()
+ // set __proto__: ƒ __proto__()
+ // }
+
+b.__proto__.__proto__.__proto__
+ // null
+
+b.prototype
+ // {
+ // constructor: ƒ ()
+ /// __proto__: Object
+ // }
+
+b.prototype.constructor
+ // ƒ () {}
+b.prototype.__proto__
+ // {
+ // constructor: ƒ Object()
+ // hasOwnProperty: ƒ hasOwnProperty()
+ // isPrototypeOf: ƒ isPrototypeOf()
+ // propertyIsEnumerable: ƒ propertyIsEnumerable()
+ // toLocaleString: ƒ toLocaleString()
+ // toString: ƒ toString()
+ // valueOf: ƒ valueOf()
+ // get __proto__: ƒ __proto__()
+ // set __proto__: ƒ __proto__()
+ // }
+
+--------------------------------------------
+
+c.__proto__
+ // [
+ // concat: ƒ concat()
+ // constructor: ƒ Array()
+ // copyWithin: ƒ copyWithin()
+ // entries: ƒ entries()
+ // every: ƒ every()
+ // find: ƒ find()
+ /// length: 0
+ // map: ƒ map()
+ // push: ƒ push()
+ // reduce: ƒ reduce()
+ // ...
+ // values: ƒ values()
+ // Symbol(Symbol.iterator): ƒ values()
+ // __proto__: Object
+ // ]
+
+c.__proto__.__proto__
+ // {
+ // constructor: ƒ Object()
+ // hasOwnProperty: ƒ hasOwnProperty()
+ // isPrototypeOf: ƒ isPrototypeOf()
+ // propertyIsEnumerable: ƒ propertyIsEnumerable()
+ // toLocaleString: ƒ toLocaleString()
+ // toString: ƒ toString()
+ // valueOf: ƒ valueOf()
+ // get __proto__: ƒ __proto__()
+ // set __proto__: ƒ __proto__()
+ // }
+
+c.__proto__.__proto__.__proto__
+ // null
+```
+
+The methods that we use like toString are not on our function but rather they are on the prototype. When JS Engine couldn't find it in our function it looks up on it's prototype and if it's not there too it looks on it's prototype's prototype and so on. 
+
+<br>
+
+When creating a function, a property object called prototype is being created automatically (you didn't create it yourself) and is being attached to the function object (the constructor)
+
+```js
+function Foo () {
+    this.name = 'John Doe';
+}
+Foo.prototype.myName = function () {
+    return 'My name is ' + this.name;
+}
+```
+
+If you will create a new object out of Foo using the new keyword, you basically creating (among other things) a new object that has an internal link to the function's prototype Foo we discussed earlier:
+
+```js
+var b = new Foo();
+b.__proto__ === Foo.prototype // true
+```
+
+In other words, Instances have \__proto__, classes have prototype.
+
+```js
+function Person(name){
+    this.name = name
+ }; 
+var eve = new Person("Eve");
+eve.__proto__ == Person.prototype //true
+eve.prototype  //undefined
+```
+
+**To explain let us create a function**
+
+```js
+function a (name) {
+  this.name = name;
+ }
+```
+
+
+When JavaScript executes this code, it adds prototype property to a, prototype property is an object with two properties to it:
+
+1. constructor
+
+2. \_proto_
+
+   
+
+   So when we do a.prototype
+    it returns
+
+   ```js
+    constructor: a()
+   __proto__: Object
+   ```
+
+   
+
+
+Now as you can see constructor is nothing but the function a itself and \__proto__ points to the root level Object of JavaScript.
+
+Let us see what happens when we use a function with new key word.
+
+`var b = new a ('JavaScript');`
+
+When JavaScript executes this code it does 4 things:
+
+1.	It creates a new object, an empty object // {}
+2.	It creates \_proto_ on b and makes it point to a.prototype so b.\__proto__ === a.prototype
+3.	It executes a.prototype.constructor (which is definition of function a ) with the newly created object (created in step#1) as its context (this), hence the name property passed as 'JavaScript' (which is added to this) gets added to newly created object.
+4.	It returns newly created object in (created in step#1) so var b gets assigned to newly created object.
+   Now if we add a.prototype.car = "BMW" and do  b.car, the output "BMW" appears.
+
+this is because when JavaScript executed this code it searched for car property on b, it did not find then JavaScript used b.\__proto__ (which was made to point to 'a.prototype' in step#2) and finds car property so return "BMW".
+
+<br>
+
+More info - [Prototypes in JavaScript](https://medium.com/better-programming/prototypes-in-javascript-5bba2990e04b) on medium
+
+
+
 ## Value vs Reference
 
 ### By Value
@@ -757,3 +1010,76 @@ console.log(arr1 === arr2); // -> false
 
 
 
+## Constructor Pattern for Creating Objects
+
+For creation of simple objects that may only ever be used once in your application to store data, simple object literal method would suffice. Imagine you have an application that displays fruits and detail about each fruit. All fruits in your application have these properties: color, shape, sweetness, cost, and a showName function. It would be quite tedious and counterproductive to type the following every time you want to create a new fruit object.
+
+
+
+```js
+var mangoFruit = {
+color: "yellow",
+sweetness: 8,
+fruitName: "Mango",
+nativeToLand: ["South America", "Central America"],
+
+showName: function () {
+console.log("This is " + this.fruitName);
+},
+nativeTo: function () {
+ this.nativeToLand.forEach(function (eachCountry)  {
+            console.log("Grown in:" + eachCountry);
+        });
+}
+}
+```
+
+If you have 10 fruits, you will have to add the **same** code 10 times. And what if you had to make a change to the nativeTo function? You will have to make the change in 10 different places. 
+
+<br>
+
+To solve the repetitive code problems, software engineers have invented patterns (solutions for repetitive and common tasks) to make developing applications more efficient and streamlined.
+
+
+
+
+```js
+function Fruit (theColor, theSweetness, theFruitName, theNativeToLand) {
+    this.color = theColor;
+    this.sweetness = theSweetness;
+    this.fruitName = theFruitName;
+    this.nativeToLand = theNativeToLand;
+    
+    this.showName = function () {
+        console.log("This is a " + this.fruitName);
+    }
+    
+    this.nativeTo = function () {
+    this.nativeToLand.forEach(function (eachCountry)  {
+       console.log("Grown in:" + eachCountry);
+        });
+    }
+}
+```
+
+With this pattern in place, it is very easy to create all sorts of fruits. 
+
+
+
+```js
+var mangoFruit = new Fruit ("Yellow", 8, "Mango", ["South America", "Central America", "West Africa"]);
+mangoFruit.showName(); // This is a Mango.
+mangoFruit.nativeTo();
+//Grown in:South America
+// Grown in:Central America
+// Grown in:West Africa
+
+var pineappleFruit = new Fruit ("Brown", 5, "Pineapple", ["United States"]);
+pineappleFruit.showName(); // This is a Pineapple.
+```
+
+
+
+```js
+console.log(Object.keys(car)); //prints ['make', 'model', 'year', 'condition', 'mileage']
+```
