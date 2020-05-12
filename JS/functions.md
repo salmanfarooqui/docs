@@ -463,7 +463,89 @@ alert(user.name); // John
 alert(User.prototype.name); // undefined
 ```
 
-Technically, they are processed after the constructor has done it’s job.  Class fields are a recent addition to the language so older browsers may need a polyfill
+Technically, they are processed after the constructor has done it’s job.  Class fields are a recent addition to the language so older browsers may need a polyfill.
+
+<br>
+
+A good way to hide internal data of an object is to use the private fields. Prefix the field name with the special symbol `#` to make it private. 
+
+```javascript
+class User {
+  #name;
+  constructor(name) {
+    this.#name = name;
+  }
+  getName() {
+    return this.#name;
+  }
+}
+
+const user = new User('Jon Snow');
+user.getName(); // => 'Jon Snow'
+user.#name;     // SyntaxError is thrown
+```
+
+`#name` is a private field. You can access and modify `#name` within the body of the `User`. The method `getName()` can access the private field `#name`. But if you try to access the private field `#name` outside of `User` class body, a syntax error is thrown.
+
+
+
+### this
+
+functions in JavaScript have a dynamic `this`. It depends on the context of the call. So if an object method is passed around and called in another context, `this` won’t be a reference to its object any more.
+
+```javascript
+class Button {
+  constructor(value) {
+    this.value = value;
+  }
+  click() {
+    alert(this.value);
+  }
+}
+
+let button = new Button("hello");
+setTimeout(button.click, 1000); // undefined
+```
+
+The problem is called "losing `this`".
+
+There are two approaches to fixing it -
+
+1. Pass a wrapper-function, such as `setTimeout(() => button.click(), 1000)`.
+2. Bind the method to object, e.g. in the constructor.
+
+```javascript
+class Button {
+  constructor(value) {
+    this.value = value;
+    this.click = this.click.bind(this);
+  }
+  click() {
+    alert(this.value);
+  }
+}
+
+let button = new Button("hello");
+setTimeout(button.click, 1000); // hello
+```
+
+Class fields provide a more elegant syntax for the latter solution.
+
+```javascript
+class Button {
+  constructor(value) {
+    this.value = value;
+  }
+  click = () => {
+    alert(this.value);
+  }
+}
+
+let button = new Button("hello");
+setTimeout(button.click, 1000); // hello
+```
+
+The class field `click = () => {...}` creates an independent function on each `Button` object, with `this` bound to the object. Then we can pass `button.click` around anywhere, and it will be called with the right `this`.
 
 
 
