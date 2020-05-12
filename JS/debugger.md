@@ -130,3 +130,22 @@ When enabled, and the developer tools is open, a script error automatically paus
 > 3. An error (if dev tools are open and the `||` button is “on”).
 >
 > When paused, we can debug – examine variables and trace the code to see where the execution goes wrong.
+
+
+
+## performance
+
+Measure code performance
+
+```js
+// Take a timestamp at the beginning.
+var start = performance.now();
+
+// Execute your code here 
+
+// Take a final timestamp.
+var end = performance.now();
+
+// Calculate the time taken and output the result in the console
+console.log(`${end - start} miliseconds to run`);
+```

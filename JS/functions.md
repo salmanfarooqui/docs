@@ -271,7 +271,64 @@ By using an IIFE, we create a new scope for our callback function. Our IIFE take
 
 ## classes
 
-Classes are in fact "special functions", and just as you can define function expressions and function declarations, the class syntax has two components: class expressions and class declarations.
+Classes are "special functions". 
+
+```javascript
+class User {
+  constructor(name) { this.name = name; }
+  sayHi() { alert(this.name); }
+}
+
+// proof: User is a function
+alert(typeof User); // function
+```
+
+What `class User {...}` construct really does is:
+
+1. Creates a function named `User`, that becomes the result of the class declaration. The function code is taken from the `constructor` method (assumed empty if we don’t write such method).
+2. Stores class methods, such as `sayHi`, in `User.prototype`.
+
+After `new User` object is created, when we call its method, it’s taken from the prototype. So the object has access to class methods. We can illustrate the result of `class User` declaration as -
+
+![class01](https://docs.salmanfarooqui.com/JS/images/class01.png)
+
+```javascript
+alert(User === User.prototype.constructor); // true
+alert(User.prototype.sayHi); // alert(this.name);
+```
+
+Sometimes `class` is called “syntactic sugar” (syntax that is designed to make things easier to read, but doesn’t introduce anything new), because we could actually declare the same without `class` keyword at all:
+
+```javascript
+// rewriting class User in pure functions
+
+// 1. Create constructor function
+function User(name) {
+  this.name = name;
+}
+// a function prototype has "constructor" property by default,
+// so we don't need to create it
+
+// 2. Add the method to prototype
+User.prototype.sayHi = function() {
+  alert(this.name);
+};
+
+// Usage:
+let user = new User("John");
+user.sayHi();
+```
+
+The result of this definition is about the same. Still there are many difference like -
+
+- Class methods are non-enumerable. A class definition sets `enumerable` flag to `false` for all methods in the `"prototype"`. That’s good, because if we `for..in` over an object, we usually don’t want its class methods.
+- Classes always `use strict`. All code inside the class construct is automatically in strict mode.
+- Class declarations are not `hoisted`. So Class declarations are not `hoisted` means, you can’t use a class before it is declared, it will return `not defined` error.
+- Classes doesn’t allow the property value assignments like constructor functions or object literals. You can only have functions or getters / setters. So no `property:value` assignments directly in the class. We can use [class fields](/JS/functions#class-fields).
+
+<br>
+
+Just as you can define function expressions and function declarations, the class syntax has two components: class expressions and class declarations.
 
 ### Class declaration
 
@@ -323,7 +380,28 @@ console.log(Rectangle.name);
 
 ### Constructor
 
-The `constructor` method is a special method **for creating and initializing** an object created with a `class`. In other words, the properties are created and initialized inside a `constructor()` method. There can only be one special method with the name "constructor" in a class. The constructor method is called each time the class object is initialized. A constructor can use the `super` keyword to call the constructor of the super class.
+That’s the place where you set the initial values for the fields, or do any kind of object setup. Inside the constructor `this` value equals to the newly created instance. The arguments used to instantiate the class become the parameters of the constructor.
+
+```javascript
+class User {
+  constructor(name) {
+    name; // => 'Jon Snow'    
+    this.name = name;
+  }
+}
+
+const user = new User('Jon Snow');
+```
+
+If you don’t define a constructor for the class, a default one is created. The default constructor is an empty function, which doesn’t modify the instance.
+
+The `constructor` method is a special method **for creating and initializing** an object created with a `class`. The constructor method is called each time the class object is initialized. A constructor can use the `super` keyword to call the constructor of the super class.
+
+**`constructor` requires `new` keyword to work.** It means constructor will only be called when we do following.
+
+```js
+let car = new Vehicle("Toyota", "Corolla", "Black");
+```
 
 
 
@@ -358,9 +436,150 @@ If there is a constructor present in the subclass, it needs to **first call supe
 
 
 
+### Class Fields
+
+Previously, our classes only had methods. “Class fields” is a syntax that allows to add any properties. For instance, let’s add `name` property to `class User`
+
+```javascript
+class User {
+  name = "John";
+  sayHi() {
+    alert(`Hello, ${this.name}!`);
+  }
+}
+
+new User().sayHi(); // Hello, John!
+```
+
+The important difference of class fields is that they are set on individual objects, not `User.prototype`
+
+```javascript
+class User {
+  name = "John";
+}
+
+let user = new User();
+alert(user.name); // John
+alert(User.prototype.name); // undefined
+```
+
+Technically, they are processed after the constructor has done it’s job.  Class fields are a recent addition to the language so older browsers may need a polyfill
+
+
+
+### Explaination
+
+Let's say we have constructor function like this -
+
+```js
+function Vehicle(make, model, color) {
+        this.make = make,
+        this.model = model,
+        this.color = color,
+        this.getName = function () {
+            return this.make + " " + this.model;
+        }
+}
+
+// can create as many objects of type Vehicle as we want by adding 1 line of code
+let car = new Vehicle("Toyota", "Corolla", "Black");
+let car2 = new Vehicle("Honda", "Civic", "White");
+```
+
+There are a few problems with this technique.
+
+- When we write `new Vehicle()`, what Javascript engine does under the hood is that it makes a copy of our `Vehicle` constructor function for each of our objects, each and every property and method is copied to the new instance of the `Vehicle`. The problem is that we don’t want the member functions (methods) of our constructor function to be repeated in every object. That is redundant.
+
+- Another problem is that we can’t add a new property or method to an existing object like this:
+
+ ```js
+  car2.year = "2012"
+ ```
+
+ To add this year property you will have to add it to the constructor function itself:
+
+ ```js
+  function Vehicle(make, model, color, year) {
+          this.make = make,
+          this.model = model,
+          this.color = color,
+          this.year = year,
+          this.getName = function () {
+              return this.make + " " + this.model;
+          }
+  }
+ ```
+
+<br>
+
+Whenever a new function is created in javascript, Javascript engine by default adds a `prototype` property to it, this property is an object and we call it “prototype object”. By default this prototype object has a constructor property which points back to our function, and another property `__proto__` which is an object.
+
+```js
+console.log(Vehicle.prototype);
+
+// {
+// constructor: ƒ Vehicle(make, model, color)
+// __proto__: Object
+// }
+
+// Now, this prototype object can be used to add new properties and methods to the constructor function using the following syntax and they will be available to all the instances of the constructor function
+
+car.prototype.year = "2016";
+```
+
+Whenever a new instance of the constructor function is created this property is also copied to the instance along with other properties and methods.
+
+- Prototype is cool, but there are a few things you need to be careful while using prototype approach. Prototype properties and methods are shared between all the instances of the constructor function, but when any one of the instances of a constructor function makes any change in any primitive property, it will only be reflected in that instance and not among all the instances.
+- Another thing is that reference type properties are always shared among all the instances, for example, a property of type array, if modified by one instance of the constructor function will be modified for all the instances
+
+<br>
+
+We understand the constructor functions and prototype, now its easy to understand the class, why? because javascript classes are nothing but just a new way of writing the constructor functions by utilizing the power of prototype. The class becomes useful when you create an *instance* of the class. An instance is an object containing data and behavior described by the class.
+
+```js
+class Vehicle {
+    constructor(make, model, color) {
+        this.make = make;
+        this.model = model;
+        this.color = color;
+    }
+
+    getName() {
+        return this.make + " " + this.model;
+    }
+}
+```
+
+And in order to create a new instance of class `Vehicle`, we do this:
+
+```js
+let car = new Vehicle("Toyota", "Corolla", "Black");
+```
+By writing the above code, we have actually created a variable named `Vehicle` which references to function constructor defined in the class, also we have added a method to the prototype of the variable `Vehicle`, same as bellow:
+
+```js
+function Vehicle(make, model, color) {
+    this.make = make;
+    this.model = model;
+    this.color = color;
+}
+
+Vehicle.prototype.getName()= function () {
+    return this.make + " " + this.model;
+}
+
+let car = new Vehicle("Toyota", "Corolla", "Black");
+```
+
+So, this proves that class is a new way of doing the constructor functions.
+
+
+
 <br>
 
 <br>
+
+
 
 Arrow functions
 

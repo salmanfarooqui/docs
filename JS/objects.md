@@ -101,14 +101,16 @@ delete person.age;   // or delete person["age"];
 
 ### Looping through properties
 
-`for...in` loops - This method traverses all **enumerable** properties of an object and its prototype chain
+`for...in` loops - This method traverses all **enumerable** properties **of an object and its prototype chain**
 
-To find out if an object has a specific property as one of its own property, you use the `hasOwnProperty` method. This method is very useful because from time to time you need to enumerate an object and you want only the own properties, not the inherited ones.
+To find out if an object has a specific property as one of its own property, you use the hasOwnProperty method. This method is very useful because from time to time you need to enumerate an object and you want only the own properties, not the inherited ones. hasOwnProperty restricts its search to the root elements of the object in which the property is being searched
 
 ```js
 var school = {schoolName:"MIT"};
 console.log(school.hasOwnProperty ("schoolName"));  // true
 ```
+
+
 
 ##### Enumerable
 
@@ -626,7 +628,7 @@ Class allows you to create a blueprint for an object. Then whenever you create a
 
 ### \__proto__ vs prototype in JavaScript
 
-When a function is created in JavaScript, the JavaScript engine adds a `prototype` property to the function. This `prototype` property is an object (called a prototype object) that has a `constructor` property by default.   The `constructor` property points back to the function on which `prototype` object is a property. We can access the function’s prototype property using `functionName.prototype`.
+**When a function is created in JavaScript, the JavaScript engine adds a `prototype` property to the function.** This `prototype` property is an object (called a prototype object) that has a `constructor` property by default. The `constructor` property points back to the function on which `prototype` object is a property. We can access the function’s prototype property using `functionName.prototype`.
 
 ![1_15Qo3ab3NPkLfXpj5AncaQ](https://docs.salmanfarooqui.com/JS/images/1_15Qo3ab3NPkLfXpj5AncaQ.png)
 
@@ -636,7 +638,7 @@ In other words, `prototype` is a property of a Function object. It is the protot
 
 <br>
 
-`__proto__` is internal property of an object, pointing to its prototype. Current standards provide an equivalent `Object.getPrototypeOf(O)` method, though de facto standard `__proto__` is quicker.
+`__proto__` is internal property of an object, pointing to its prototype. Current standards provide an equivalent `Object.getPrototypeOf(O)` method.
 
 <br>
 
@@ -825,6 +827,24 @@ this is because when JavaScript executed this code it searched for car property 
 
 <br>
 
+
+
+> The `__proto__` property of an object and the `Object.getPrototypeOf()` method are both ways to access the prototype of an object. 
+>
+> Because `__proto__` is simply a property of an object and was put there back in the day to access the prototype of an object. `__proto__` is now deprecated and there is a chance that certain JS engines don't support this property anymore. `Object.getPrototypeOf()` and `Object.setPrototypeOf()` are the function which now should be used in order to retrieve a prototype.
+>
+> ```js
+> // DON'T: Old method using __proto__ deprecated!
+> console.log(dog.__proto__);
+> 
+> // DO: Using the newer getPrototypeOf function
+> console.log(Object.getPrototypeOf(dog));
+> ```
+> **One difference is** that `__proto__` can be changed (a bad design practice though) while `getPrototypeOf` is a read only function.
+
+
+
+
 More info - [Prototypes in JavaScript](https://medium.com/better-programming/prototypes-in-javascript-5bba2990e04b) on medium
 
 
@@ -1010,76 +1030,127 @@ console.log(arr1 === arr2); // -> false
 
 
 
-## Constructor Pattern for Creating Objects
+## Creation Patterns
 
-For creation of simple objects that may only ever be used once in your application to store data, simple object literal method would suffice. Imagine you have an application that displays fruits and detail about each fruit. All fruits in your application have these properties: color, shape, sweetness, cost, and a showName function. It would be quite tedious and counterproductive to type the following every time you want to create a new fruit object.
+Object creation patterns.
 
+### Factory Functions
 
+With the factory pattern, we create a factory that creates specified objects and returns their reference. Every time we call the factory we get a new instance.
 
-```js
-var mangoFruit = {
-color: "yellow",
-sweetness: 8,
-fruitName: "Mango",
-nativeToLand: ["South America", "Central America"],
-
-showName: function () {
-console.log("This is " + this.fruitName);
-},
-nativeTo: function () {
- this.nativeToLand.forEach(function (eachCountry)  {
-            console.log("Grown in:" + eachCountry);
-        });
-}
-}
+```javascript
+//Factory pattern for object Creation
+var computerFactory = function(ram, hardDisk) {
+  var computer = {}; //creating a new temporary object
+  //Create class properties
+  computer.ram = ram;
+  computer.hardDisk = hardDisk;
+  //Create class methods
+  computer.AvailableMemory = function() {
+    console.log('Hard-disk : ' + this.hardDisk);
+    console.log('Ram : ' + this.ram);
+  };
+  return computer;
+};
 ```
-
-If you have 10 fruits, you will have to add the **same** code 10 times. And what if you had to make a change to the nativeTo function? You will have to make the change in 10 different places. 
-
-<br>
-
-To solve the repetitive code problems, software engineers have invented patterns (solutions for repetitive and common tasks) to make developing applications more efficient and streamlined.
-
-
-
+Now we create an object by calling the factory, like this 
 
 ```js
-function Fruit (theColor, theSweetness, theFruitName, theNativeToLand) {
-    this.color = theColor;
-    this.sweetness = theSweetness;
-    this.fruitName = theFruitName;
-    this.nativeToLand = theNativeToLand;
-    
-    this.showName = function () {
-        console.log("This is a " + this.fruitName);
-    }
-    
-    this.nativeTo = function () {
-    this.nativeToLand.forEach(function (eachCountry)  {
-       console.log("Grown in:" + eachCountry);
-        });
-    }
-}
-```
+//Creating new object(s) for computer class by using computerFactory
+var computer1 = computerFactory(4,512);
+var computer2 = computerFactory(16,1024);
 
-With this pattern in place, it is very easy to create all sorts of fruits. 
+//Accessing class methods using objects
+computer1.AvailableMemory();
+computer2.AvailableMemory();
 
-
-
-```js
-var mangoFruit = new Fruit ("Yellow", 8, "Mango", ["South America", "Central America", "West Africa"]);
-mangoFruit.showName(); // This is a Mango.
-mangoFruit.nativeTo();
-//Grown in:South America
-// Grown in:Central America
-// Grown in:West Africa
-
-var pineappleFruit = new Fruit ("Brown", 5, "Pineapple", ["United States"]);
-pineappleFruit.showName(); // This is a Pineapple.
+//Output
+// Hard-disk : 512
+// Ram : 4
+// Hard-disk : 1024
+// Ram : 16
 ```
 
 
 
+### Constructor Pattern
+
+With the constructor pattern we don’t return the instance from the function — instead, **we use the new operator along with the function name**.
+
+
+
+
 ```js
-console.log(Object.keys(car)); //prints ['make', 'model', 'year', 'condition', 'mileage']
+var computer = function(ram, hardDisk) {
+  //Create class properties
+  this.ram = ram;
+  this.hardDisk = hardDisk;
+  //Create class methods
+  this.AvailableMemory = function() {
+    console.log('Hard-disk : ' + this.hardDisk);
+    console.log('Ram : ' + this.ram);
+  };
+};
 ```
+
+Note: we’re not returning the object from the computer constructor.
+
+```js
+//Creating new object(s) for computer class by using constructor pattern
+var computer1 = new computer(4,512);
+var computer2 = new computer(16,1024);
+//Accessing object's properties
+computer1.AvailableMemory();
+computer2.AvailableMemory();
+
+//Output
+// Hard-disk : 512
+// Ram : 4
+// Hard-disk : 1024
+// Ram : 16
+```
+
+
+
+### Prototype Pattern
+
+In a prototype pattern, we create a blank object and assign properties (and functions) to its prototype, with some default values. Then we create a blank object and assign the actual values for the properties.
+
+```js
+var computer = function() {};
+computer.prototype.ram = NaN;
+computer.prototype.hardDisk = NaN;
+computer.prototype.AvailableMemory = function() {
+  console.log('Hard-disk : ' + this.hardDisk);
+  console.log('Ram : ' + this.ram);
+};
+//Creating new object(s) for computer class
+// by using Prototype Pattern
+var computer1 = new computer(); 
+//Empty object created with default values
+computer1.ram = 4; //Assigning the actual value for object property
+computer1.hardDisk = 512;
+var computer2 = new computer();
+computer2.ram = 16;
+computer2.hardDisk = 1024;
+//Accessing class methods using objects
+computer1.AvailableMemory();
+computer2.AvailableMemory();
+
+//Output
+// Hard-disk : 512
+// Ram : 4
+// Hard-disk : 1024
+// Ram : 16
+```
+
+**Note -** Every function has the "prototype" property even if we don’t supply it. The default "prototype" is an object with the only property constructor that points back to the function itself.
+
+```javascript
+function Rabbit() {}
+
+/* default prototype
+Rabbit.prototype = { constructor: Rabbit };
+*/
+```
+

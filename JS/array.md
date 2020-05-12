@@ -832,6 +832,27 @@ map, on the other hand, does have a restriction on the operation: it expects the
 
 
 
+## How To
+
+### Remove Duplicates
+
+```js
+// Method 1
+var myArray = ['a', 1, 'a', 2, '1'];
+var unique = myArray.filter((value, index, self) => self.indexOf(value) === index); 
+// not particularly efficient for large arrays
+// ['a', 1, 2, '1']
+```
+
+```js
+// Method 2
+var myArray = ['a', 1, 'a', 2, '1'];
+let unique = [...new Set(myArray)]; 
+// ['a', 1, 2, '1']
+```
+
+
+
 ## CheatSheet
 
 
