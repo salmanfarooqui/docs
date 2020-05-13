@@ -62,6 +62,22 @@ The `arguments` parameter is implicitly passed just like the `this` parameter. I
 
 
 
+### Optional Arguments
+
+The following code is allowed and executes without any problem.
+
+```js
+function square(x) { return x * x; }
+console.log(square(4, true, "hedgehog"));
+// → 16
+```
+
+We defined `square` with only one parameter. Yet when we call it with three, the language doesn’t complain. It ignores the extra arguments and computes the square of the first one.
+
+If you pass too many, the extra ones are ignored. If you pass too few, the missing parameters get assigned the value `undefined`.
+
+
+
 ### Rest Parameter
 
 Rest Parameter is an ES6 addition to JavaScript. To create a rest parameter prefix the last parameter in a function definition with ellipsis(…)
@@ -269,7 +285,7 @@ By using an IIFE, we create a new scope for our callback function. Our IIFE take
 
 
 
-## classes
+## Classes
 
 Classes are "special functions". 
 
@@ -323,7 +339,13 @@ The result of this definition is about the same. Still there are many difference
 
 - Class methods are non-enumerable. A class definition sets `enumerable` flag to `false` for all methods in the `"prototype"`. That’s good, because if we `for..in` over an object, we usually don’t want its class methods.
 - Classes always `use strict`. All code inside the class construct is automatically in strict mode.
-- Class declarations are not `hoisted`. So Class declarations are not `hoisted` means, you can’t use a class before it is declared, it will return `not defined` error.
+- Class declarations are not `hoisted` which means, you can’t use a class before it is declared, it will return `not defined` error.  
+
+```js
+const p = new Rectangle(); // ReferenceError
+class Rectangle {}
+```
+
 - Classes doesn’t allow the property value assignments like constructor functions or object literals. You can only have functions or getters / setters. So no `property:value` assignments directly in the class. We can use [class fields](/JS/functions#class-fields).
 
 <br>
@@ -339,13 +361,6 @@ class Rectangle {
     this.width = width;
   }
 }
-```
-
-An important difference between function declarations and class declarations is that **function declarations are hoisted and class declarations are not**. You first need to declare your class and then access it, otherwise code like the following will throw a ReferenceError:
-
-```js
-const p = new Rectangle(); // ReferenceError
-class Rectangle {}
 ```
 
 
@@ -657,6 +672,44 @@ So, this proves that class is a new way of doing the constructor functions.
 
 
 
+## Recursion
+
+It is perfectly okay for a function to call itself, as long as it doesn’t do it so often that it overflows the stack. **A function that calls itself** is called *recursive*.
+
+```js
+function factorial(x) {
+  if (x < 0) return;
+  if (x === 0) return 1;
+  return x * factorial(x - 1);
+}
+factorial(3);
+// 6
+```
+
+All recursive functions should have two key features -
+
+1. **A Termination Condition** - Simply put, `if(something bad happened){ STOP };` The Termination Condition is our recursion fail-safe. Think of it like your emergency brake. It’s put there in case of bad input to prevent the recursion from ever running.
+2. **A Base Case** - Simply put, `if(this happens) { Yay! We're done };` The Base Case is similar to our termination condition in that it also stops our recursion. But remember, the termination condition is a catch-all for bad data. Whereas the base case is *the goal* of our recursive function. In the factorial example, `if (x === 0) return 1;` is our base case.
+
+```js
+function factorial(x) {
+  // TERMINATION
+  if (x < 0) return;
+    
+  // BASE
+  if (x === 0) return 1;
+    
+  // RECURSION
+  return x * factorial(x - 1);
+}
+```
+
+Unlike loops, the recursive version doesn't need extra variables to track its progress. Each call to `factorial` adds to the stack, feeding it `x - 1` (updated parameters).
+
+
+
+> Recursive functions let you perform a unit of work multiple times. This is exactly what `for/while` loops let us accomplish! Sometimes, however, recursive solutions are a more elegant approach to solving a problem. Running through a simple loop is generally cheaper than calling a function multiple times.
+
 <br>
 
 <br>
@@ -668,8 +721,6 @@ Arrow functions
 pure functions
 
 higher order functions
-
-this,closure,recursion
 
 
 
