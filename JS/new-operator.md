@@ -23,14 +23,30 @@ Now, call it like this with `new`:
 var bar = new Foo();
 ```
 
-What happens when you add `new` to a function call is that a new object is created (just `var bar = new Object()`) and that the `this` within the function points to the new `Object` you just created, instead of to the object that called the function. So `bar` is now an object with the properties `A` and `B`. 
+What happens when you add `new` to a function call is that a **new empty object is created and `this` within the function points to the new `Object`** you just created, instead of to the object that called the function. So `bar` is now an object with the properties `A` and `B`. 
+
+```js
+console.log(bar);
+// Foo {A: 1, B: 2}
+```
+
+<br>
+
+To check if `bar` is an instance of `Foo`, we can do 
+
+```js
+console.log(bar instanceof Foo);
+// true
+```
+
+It checks the prototype chain and if it finds `Foo`, it returns true.
 
 <br >
 <br >
 
 Constructor functions technically are regular functions. There are two conventions though:
 
-1. They are ***named with capital letter first.***
+1. They are **named with capital letter first.**
 2. They should be executed only with `"new"` operator.
 
 
@@ -53,10 +69,10 @@ The *new operator* lets developers create an instance of a user-defined object t
 >
 > When a function is executed with `new`, it does the following steps:
 >
-> 1. ***A new empty object is created and assigned to `this`.***
+> 1. **A new empty object is created and assigned to `this`.**
 > 2. Links (sets the constructor of) this object to another object;
 > 3. The function body executes. Usually it modifies `this`, adds new properties to it.
-> 4. ***The value of `this` is returned, if the function doesn't return its own object.***
+> 4. **The value of `this` is returned, if the function doesn't return its own object.**
 >
 > In other words, `new User(...)` does something like:
 >
@@ -80,6 +96,85 @@ But if there is a `return` statement, then the rule is simple:
 
 - If `return` is called with an object, then the object is returned instead of `this`.
 - If `return` is called with a primitive, it’s ignored.
+
+<br>
+
+Every function in javascript has a prototype property. It sarts of it's life as an empty object. But it's never used unless we use the function as function constructor i.e with new keyword. The proptotype property on the function is not the prototype of the function. You can add properties to function prototype.
+
+```js
+function User(name) {
+	this.name = name;
+}
+let user = new User("Jack");
+
+User.prototype.address = "12 Palace Road, NY";
+
+console.log(User.prototype)
+// {
+// address:12 Palace Road, NY
+// constructor:f User(name)
+// }
+
+console.log(user.__proto__)
+// {
+// address:12 Palace Road, NY
+// constructor:f User(name)
+// }
+
+console.log(User.prototype === user.__proto__) // true
+
+console.log(user);
+// {
+//	name: "Jack"
+//  __proto__:
+//  address:12 Palace Road, NY
+//  constructor:f User(name)
+//  }
+```
+
+If i have many different objects created using new function, i can give them all, in one line, access to a new method, even after they were created.
+
+```js
+function User(name) {
+	this.name = name;
+}
+let user = new User("Jack");
+let user1 = new User("Matt");
+let user2 = new User("Tom");
+
+User.prototype.hello = function () {
+return 'Hi,'+ this.name;
+}
+
+console.log(user.hello()); // Hi, Jack
+console.log(user1.hello()); // Hi, Matt
+console.log(user2.hello()); // Hi, Tom
+```
+
+> A good practice is to set properties inside the constructor function and methods outside(using prototype). Function in JS are objects, anything you add to them will take up memory space. If we added `hello` inside constructor then every object(user, user1, user2) will get it's copy of `hello`. By adding it to prototype, we only have one method, less memory space.
+
+
+
+Let's say we want to add a feature to all Strings in our JS, we can do that using prototype.
+
+```js
+String.prototype.isLengthGreaterThan = function(limit) {
+	return this.length > limit;
+}
+console.log("John".isLengthGreaterThan(3));  // true
+
+
+Number.prototype.isPositive = function() {
+    return this > 0;
+}
+console.log(3.isPositive()); // Uncaught SyntaxError
+// while JS converted an string to object automatically 
+// it wont convert number to object automatically
+
+
+var a = new Number(3); // (a) looks like number but actually an object
+console.log(a.isPositive()); // true
+```
 
 <br>
 <br>

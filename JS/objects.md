@@ -416,17 +416,52 @@ let protoRabbit = {
   }
 };
 let killerRabbit = Object.create(protoRabbit);
+
+console.log(killerRabbit);
+// logs an empty object {} with protoRabbit object as it prototype
+// {
+// 		__proto__: {
+// 		speak: ƒ speak(line)
+// 		__proto__: Object
+// 		}
+// }
+
 killerRabbit.type = "killer";
+console.log(killerRabbit);
+// {
+// type: "killer"
+// 		__proto__: {
+// 		speak: ƒ speak(line)
+// 		__proto__: Object
+//		}
+// }
+
 killerRabbit.speak("SKREEEE!"); // → The killer rabbit says 'SKREEEE!'
 ```
 
-The Object.create() method creates a new object ***using an existing object as the prototype of the newly created object.*** Object.create() is used for implementing inheritance. 
+The Object.create() method **creates a new object using an existing object as the prototype of the newly created object.** Object.create() is used for implementing inheritance. 
 
-Here, killerRabbit does not have speak property so it looks it in it's prototype i.e protoRabbit and executes it. The protoRabbit acts as a container for the properties that are shared by all rabbits. An individual rabbit object, like the killerRabbit, contains properties that apply only to itself and derives shared properties from its prototype.
+Here, killerRabbit does not have speak property so it looks it in it's prototype i.e protoRabbit and executes it. The protoRabbit acts as a container for the properties that are shared by all rabbits. An individual rabbit object, like the **killerRabbit, contains properties that apply only to itself and derives shared properties from its prototype.**
 
 A ***property like `speak(line)` in an object expression is a shorthand way of defining a method.*** It creates a property called `speak` and gives it a function as its value.
 
+Let's look at the Object.create() polyfill to see what it's actually doing.
 
+```js
+if(!Object.create) {
+	Object.create = function (o) {
+		// if(arguements.length > 1) {
+		// throw new Error('only accepts first parameter');		
+		// }
+		function F() {}
+		F.prototype = o;
+		return new F(); // new creates an empty object, then runs F() 
+        // and then points the prototype of that new empty object to whatever object you passed in
+	};
+}
+```
+
+<br>
 
 #### All in One, Object.create, prototype, new
 
