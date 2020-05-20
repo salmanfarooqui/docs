@@ -279,7 +279,7 @@ child.addEventListener('click', function(e) {
 // Child Clicked
 ```
 
-Here, event will not bubble up(travel up) from target element to the top element of DOM.
+
 
 > By default, **all event handlers are triggered only during the target and bubbling phase**. We can handle events during the capture phase by setting useCapture, the third argument of addEventListener, to true.
 >
@@ -317,8 +317,8 @@ Here, event will not bubble up(travel up) from target element to the top element
 > class Menu {
 >  constructor(elem) {
 >    elem.onclick = this.onClick.bind(this); 
->      // bind this.onClick to always run with the context of the Menu object. 
->      // will run the onClick method with "this" = Menu object created at the time it was bound
+>      // elem is menu dom node, 'this' is empty Menu object with __proto__ containing save, load and onClick methods
+>      // onClick is bound to Menu object, inside onClick 'this' will referance Menu Object
 >  }
 > 
 >  save() {
@@ -346,10 +346,317 @@ Here, event will not bubble up(travel up) from target element to the top element
 
 ### Dispatch Events
 
+We can not only assign handlers, but also generate events from JavaScript.
+
+We can create `Event` objects like this:
+
+```javascript
+let event = new Event(type[, options]);
+```
+
+- <u>type</u> – event type, a string like `"click"` or our own like `"my-event"`.
+
+- <u>options</u> – the object with two optional properties:
+
+  - <u>bubbles: true/false</u> – if `true`, then the event bubbles.
+  - <u>cancelable: true/false</u> – if `true`, then the “default action” may be prevented. Later we’ll see what it means for custom events.
+
+  By default both are false: `{bubbles: false, cancelable: false}`.
+
+After an event object is created, we should “run” it on an element using the call `elem.dispatchEvent(event)`. Then handlers react on it as if it were a regular browser event. If the event was created with the `bubbles` flag, then it bubbles.
+
+In the example below the `click` event is initiated in JavaScript. The handler works same way as if the button was clicked -
+
+```js
+<button id="elem" onclick="alert('Click!');">Autoclick</button>
+
+let event = new Event("click");
+elem.dispatchEvent(event);
+```
+
+**Example -** 
+
+We can create a bubbling event with the name `"hello"` and catch it on `document`.
+
+```js
+<h1 id="elem">Hello from the script!</h1>
+
+ // catch on document...
+ document.addEventListener("hello", function(event) { // (1)
+    alert("Hello from " + event.target.tagName); // Hello from H1
+ });
+
+ // ...dispatch on elem!
+ let event = new Event("hello", {bubbles: true}); // (2)
+ elem.dispatchEvent(event);
+
+ // the handler on document will activate and display the message.
+```
+
+1. We should use `addEventListener` for our custom events, because `on` only exists for built-in events, `document.onhello` doesn’t work.
+2. Must set `bubbles:true`, otherwise the event won’t bubble up.
+
+> There is a way to tell a “real” user event from a script-generated one. The property `event.isTrusted` is `true` for events that come from real user actions and `false` for script-generated events.
+
+
+
+**Event Types**
+
+Here’s a short list of classes for UI Events from the UI Event specification:
+
+- `UIEvent`
+- `FocusEvent`
+- `MouseEvent`
+- `WheelEvent`
+- `KeyboardEvent`
+
+We should use them instead of `new Event` if we want to create such events. For instance, `new MouseEvent("click")`. The right constructor allows to specify standard properties for that type of event.
+
+Like `clientX/clientY` for a mouse event -
+
+```javascript
+let event = new MouseEvent("click", {
+  bubbles: true,
+  cancelable: true,
+  clientX: 100,
+  clientY: 100
+});
+
+alert(event.clientX); // 100
+// the generic Event constructor does not allow clientX, clientY
+// Technically, we can work around that by assigning directly event.clientX=100 after creation
+```
+
+**Custom Events**
+
+completely new events types like `"hello"` we should use `new CustomEvent`. Technically [CustomEvent](https://dom.spec.whatwg.org/#customevent) is the same as `Event`, with one exception. In the second argument (object) we can add an additional property `detail` for any custom information that we want to pass with the event.
+
+```js
+<h1 id="elem">Hello for John!</h1>
+
+  // additional details come with the event to the handler
+  elem.addEventListener("hello", function(event) {
+    alert(event.detail.name);
+  });
+
+  elem.dispatchEvent(new CustomEvent("hello", {
+    detail: { name: "John" }
+  }));
+```
+
+The `detail` property can have any data. Technically we could live without, because we can assign any properties into a regular `new Event` object after its creation. But `CustomEvent` provides the special `detail` field for it to evade conflicts with other event properties.
+
+
+
+**event.preventDefault()**
+
+Many browser events have a “default action”, such as nagivating to a link, starting a selection, and so on.
+
+For new, custom events, there are definitely no default browser actions, but a code that dispatches such event may have its own plans what to do after triggering the event. By calling `event.preventDefault()`, an event handler may send a signal that those actions should be canceled. In that case the call to `elem.dispatchEvent(event)` returns `false`. And the code that dispatched it knows that it shouldn’t continue.
+
+
+
+```js
+<button onclick="hide()">Hide()</button>
+
+  // hide() will be called automatically in 2 seconds
+  function hide() {
+    let event = new CustomEvent("hide", {
+      cancelable: true // without that flag preventDefault doesn't work
+    });
+    if (!rabbit.dispatchEvent(event)) {
+      alert('The action was prevented by a handler');
+    } else {
+      rabbit.hidden = true;
+    }
+  }
+
+  rabbit.addEventListener('hide', function(event) {
+    if (confirm("Call preventDefault?")) {
+      event.preventDefault();
+    }
+  });
+```
+
+
+
+**Events-in-events are synchronous**
+
+Usually events are processed in a queue. That is: if the browser is processing `onclick` and a new event occurs, then it’s handing is queued up and will be called after `onclick` processing is finished.
+
+Except when one event is initiated from within another one, e.g. using `dispatchEvent`. Such events are processed immediately: the new event handlers are called, and then the current event handling is resumed.
+
+```js
+<button id="menu">Menu (click me)</button>
+
+menu.onclick = function() {
+alert(1);
+
+menu.dispatchEvent(new CustomEvent("menu-open", {
+bubbles: true
+}));
+
+alert(2);
+};
+
+// triggers between 1 and 2
+document.addEventListener('menu-open', () => alert('nested'));
+```
+
+*Output - 1 → nested → 2*
+
+It’s processed immediately, without waiting for onlick handler to end. 
+
+Please note that the nested event `menu-open` is caught on the `document`. The propagation and handling of the nested event is finished before the processing gets back to the outer code (`onclick`). That’s not only about `dispatchEvent`, there are other cases. If an event handler calls methods that trigger to other events – they are too processed synchronously, in a nested fashion.
+
+Let's say we want `onclick` to be fully processed first, independently from `menu-open`. Then we can either put the `dispatchEvent` (or another event-triggering call) at the end of `onclick` or, maybe better, wrap it in the zero-delay `setTimeout`:
+
+```js
+setTimeout(() => menu.dispatchEvent(new CustomEvent("menu-open", {
+   bubbles: true
+})));
+```
+
+Now `dispatchEvent` runs asynchronously after the current code execution is finished, including `mouse.onclick`, so event handlers are totally separate. *The output order becomes 1 → 2 → nested.*
+
+
 
 
 
 ### Load event
+
+The lifecycle of an HTML page has three important events:
+
+- <u>DOMContentLoaded</u> – the browser fully loaded HTML, and the DOM tree is built, but external resources like pictures (img tags) and stylesheets may be not yet loaded. DOM is ready, so the handler can lookup DOM nodes, initialize the interface. The `DOMContentLoaded` event happens on the `document` object.
+
+  We must use `addEventListener` to catch it:
+
+  ```javascript
+  document.addEventListener("DOMContentLoaded", ready);
+  // not "document.onDOMContentLoaded = ..."
+  ```
+
+- <u>load</u> – not only HTML is loaded, but also all the external resources: images, styles etc. External resources are loaded, so styles are applied, image sizes are known etc.
+
+- <u>beforeunload/unload</u> – the user is leaving the page. 1) `beforeunload` – the user is leaving: we can check if the user saved the changes and ask them whether they really want to leave. 2) `unload` – the user almost left, but we still can initiate some operations, such as sending out statistics.
+
+
+
+**DOMContentLoaded**
+
+When the browser processes an HTML-document and comes across a `<script>` tag, it needs to execute before continuing building the DOM. As scripts may want to modify DOM, and even `document.write` into it, so `DOMContentLoaded` has to wait. So DOMContentLoaded definitely happens after such scripts.
+
+```html
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    alert("DOM ready!");
+  });
+</script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.3.0/lodash.js"></script>
+
+<script>
+  alert("Library loaded, inline script executed");
+</script>
+
+// Library loaded, inline script executed
+// DOM ready!
+```
+
+There are two exceptions from this rule:
+
+1. Scripts with the `async` attribute, don’t block `DOMContentLoaded`.
+2. Scripts that are generated dynamically with `document.createElement('script')` and then added to the webpage also don’t block this event.
+
+External style sheets don’t affect DOM, so `DOMContentLoaded` does not wait for them. But there’s a pitfall. If we have a script after the style, then that script must wait until the stylesheet loads.
+
+```html
+<link type="text/css" rel="stylesheet" href="style.css">
+<script>
+  // the script doesn't not execute until the stylesheet is loaded
+  alert(getComputedStyle(document.body).marginTop);
+</script>
+```
+
+The reason for this is that the script may want to get coordinates and other style-dependent properties of elements, like in the example above. Naturally, it has to wait for styles to load. As `DOMContentLoaded` waits for scripts, it now waits for styles before them as well.
+
+
+
+**window.onload**
+
+The `load` event on the `window` object triggers when the whole page is loaded including styles, images and other resources. This event is available via the `onload` property.
+
+```html
+<script>
+  window.onload = function() { // same as window.addEventListener('load', (event) => {
+    alert('Page loaded');
+    // image is loaded at this time
+    alert(`Image size: ${img.offsetWidth}x${img.offsetHeight}`);
+  };
+</script>
+
+<img id="img" src="https://en.js.cx/clipart/train.gif?speed=1&cache=0">
+```
+
+
+
+**window.onunload**
+
+When a visitor leaves the page, the `unload` event triggers on `window`. We can do something there that doesn’t involve a delay, like closing related popup windows.
+
+```javascript
+window.addEventListener("unload", function() {
+  navigator.sendBeacon("/analytics", JSON.stringify(analyticsData));
+};
+```
+
+
+
+**window.onbeforeunload**
+
+If a visitor initiated navigation away from the page or tries to close the window, the `beforeunload` handler asks for additional confirmation.
+
+```javascript
+window.onbeforeunload = function() {
+  return false;
+};
+// if we run this and then reload page, a popup will appear asking for confirmation
+```
+
+
+
+**readyState**
+
+There are cases when we are not sure whether the document is ready or not. We’d like our function to execute when the DOM is loaded, be it now or later.
+
+The `document.readyState` property tells us about the current loading state. There are 3 possible values.
+
+- <u>"loading"</u> – the document is loading.
+- <u>"interactive"</u> – the document was fully read.
+- <u>"complete"</u> – the document was fully read and all resources (like images) are loaded too.
+
+So we can check `document.readyState` and setup a handler or execute the code immediately if it’s ready.
+
+```javascript
+function work() { /*...*/ }
+
+if (document.readyState == 'loading') {
+  // loading yet, wait for the event
+  document.addEventListener('DOMContentLoaded', work);
+} else {
+  // DOM is ready!
+  work();
+}
+```
+
+There’s also the `readystatechange` event that triggers when the state changes.
+
+```javascript
+document.addEventListener('readystatechange', () => console.log(document.readyState));
+// print state changes
+```
+
+The readystatechange event is an alternative mechanics of tracking the document loading state, it appeared long ago. Nowadays, it is rarely used.
 
 
 
