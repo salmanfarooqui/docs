@@ -88,6 +88,241 @@ We can convert them to each other easily. To convert Object literal to Json use,
 
 
 
+## Script tag
+
+When the browser loads HTML and comes across a `...` tag, it can’t continue building the DOM. It must execute the script right now. The same happens for external scripts ``: the browser must wait until the script downloads, execute it, and only after process the rest of the page.
+
+That leads to two important issues:
+
+1. Scripts can’t see DOM elements below them, so they can’t add handlers etc.
+2. If there’s a bulky script at the top of the page, it “blocks the page”. Users can’t see the page content till it downloads and runs.
+
+Luckily, there are two `<script>` attributes that solve the problem for us - defer and async.
+
+
+
+### defer
+
+The `defer` attribute tells the browser that it should go on working with the page, and load the script “in background”, then run the script when it loads.
+
+```html
+<p>...content before script...</p>
+
+<script defer src="https://javascript.info/article/script-async-defer/long.js?speed=1"></script>
+
+<!-- visible immediately -->
+<p>...content after script...</p>
+```
+
+- Scripts with `defer` never block the page.
+- Scripts with `defer` always execute when the DOM is ready, but before `DOMContentLoaded` event. DOMContentLoaded waits for the deferred script.
+
+The `defer` attribute is only for external scripts.
+
+So, if we have a long script first, and then a smaller one, then the latter one waits.
+
+```html
+<script defer src="https://javascript.info/article/script-async-defer/long.js"></script>
+<script defer src="https://javascript.info/article/script-async-defer/small.js"></script>
+```
+
+Browsers scan the page for scripts and download them in parallel, to improve performance. So in the example above both scripts download in parallel. The small.js probably makes it first. But the s**pecification requires scripts to execute in the document order, so it waits for long.js to execute**.
+
+
+
+### async
+
+The `async` attribute means that a script is completely independent:
+
+- The page doesn’t wait for async scripts, the contents are processed and displayed.
+
+- `DOMContentLoaded` and async scripts don’t wait for each other:
+- DOMContentLoaded may happen both before an async script (if an async script finishes loading after the page is complete)
+  - …or after an async script (if an async script is short or was in HTTP-cache)
+  
+- Other scripts don’t wait for `async` scripts, and `async` scripts don’t wait for them.
+
+So, if we have several `async` scripts, they may execute in any order. **Whatever loads first – runs first.**
+
+```html
+<p>...content before scripts...</p>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => alert("DOM ready!"));
+</script>
+
+<script async src="https://javascript.info/article/script-async-defer/long.js"></script>
+<script async src="https://javascript.info/article/script-async-defer/small.js"></script>
+
+<p>...content after scripts...</p>
+```
+
+1. The page content shows up immediately: `async` doesn’t block it.
+2. `DOMContentLoaded` may happen both before and after `async`, no guarantees here.
+3. Async scripts don’t wait for each other. A smaller script `small.js` goes second, but probably loads before `long.js`, so runs first. That’s called a “load-first” order.
+
+Async scripts are great when we integrate an independent third-party script into the page: counters, ads and so on, as they don’t depend on our scripts, and our scripts shouldn’t wait for them.
+
+
+
+### dynamic
+
+```javascript
+let script = document.createElement('script');
+script.src = "/article/script-async-defer/long.js";
+document.body.append(script); 
+// script starts loading as soon as it’s appended to the document
+```
+
+**Dynamic scripts behave as “async” by default.**
+
+- They don’t wait for anything, nothing waits for them.
+- The script that loads first – runs first (“load-first” order).
+
+For example, here we add two scripts. Without `script.async=false` they would execute in load-first order (the `small.js` probably first). But with that flag the order is “as in the document”:
+
+```javascript
+function loadScript(src) {
+  let script = document.createElement('script');
+  script.src = src;
+  script.async = false;
+  document.body.append(script);
+}
+
+// long.js runs first because of async=false
+loadScript("/article/script-async-defer/long.js");
+loadScript("/article/script-async-defer/small.js");
+```
+
+<br>
+
+<br>
+
+The browser allows us to track the loading of external resources – scripts, iframes, pictures and so on.
+
+There are two events for it -
+
+- <u>onload</u> – successful load,
+- <u>onerror</u> – an error occurred.
+
+Let's say we load ascript dynamically, like this:
+
+```javascript
+let script = document.createElement('script');
+script.src = "my.js";
+
+document.head.append(script);
+```
+
+But how to run the function that is declared inside that script? We need to wait until the script loads, and only then we can call it.
+
+### script.onload
+
+The main helper is the `load` event. It triggers after the script was loaded and executed.
+
+```javascript
+let script = document.createElement('script');
+
+// can load any script, from any domain
+script.src = "https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.3.0/lodash.js"
+document.head.append(script);
+
+script.onload = function() {
+  // the script creates a helper function "_"
+  alert(_); // the function is available
+};
+```
+
+So in `onload` we can use script variables, run functions etc. And what if the loading failed? For instance, there’s no such script (error 404) or the server is down (unavailable).
+
+
+
+### script.onerror
+
+Errors that occur during the loading of the script can be tracked in an `error` event.
+
+```javascript
+let script = document.createElement('script');
+script.src = "https://example.com/404.js"; // no such script
+document.head.append(script);
+
+script.onerror = function() {
+  alert("Error loading " + this.src); // Error loading https://example.com/404.js
+};
+```
+
+Please note that we can’t get HTTP error details here. We don’t know if it was an error 404 or 500 or something else. Just that the loading failed.
+
+> Events `onload`/`onerror` track only the loading itself. Errors that may occur during script processing and execution are out of scope for these events. That is: if a script loaded successfully, then `onload` triggers, even if it has programming errors in it. **To track script errors, one can use `window.onerror` global handler**.
+
+
+
+The `load` and `error` events also work for other resources, basically for any resource that has an external `src`.
+
+```javascript
+let img = document.createElement('img');
+img.src = "https://js.cx/clipart/train.gif"; // (*)
+
+img.onload = function() {
+  alert(`Image loaded, size ${img.width}x${img.height}`);
+};
+
+img.onerror = function() {
+  alert("Error occurred while loading image");
+};
+```
+
+
+
+### Crossorigin policy
+
+There’s a rule: scripts from one site can’t access contents of the other site. So, e.g. a script at `https://facebook.com` can’t read the user’s mailbox at `https://gmail.com`. o even if we have a subdomain, or just another port, these are different origins with no access to each other.
+
+If we’re using a script from another domain, and there’s an error in it, we can’t get error details.
+
+```js
+// from the same site where it’s located
+window.onerror = function(message, url, line, col, errorObj) {
+  alert(`${message}\n${url}, ${line}:${col}`);
+};
+<script src="/article/onload-onerror/crossorigin/error.js"></script>
+// Uncaught ReferenceError: noSuchFunction is not defined https://javascript.info/article/onload-onerror/crossorigin/error.js, 1:1
+
+// from another domain
+window.onerror = function(message, url, line, col, errorObj) {
+  alert(`${message}\n${url}, ${line}:${col}`);
+};
+<script src="https://cors.javascript.info/article/onload-onerror/crossorigin/error.js"></script>
+// Script error., 0:0
+```
+
+For scripts from different domain, any information about the internals of a script, including error stack traces, is hidden. 
+
+Similar cross-origin policy (CORS) is enforced for other types of resources as well.
+
+
+
+**To allow cross-origin access, the `<script>` tag needs to have the crossorigin attribute, plus the remote server must provide special headers.**
+
+There are three levels of cross-origin access:
+
+1. <u>No crossorigin attribute</u> – access prohibited.
+2. <u>crossorigin="anonymous"</u> – access allowed if the server responds with the header `Access-Control-Allow-Origin` with `*` or our origin. Browser does not send authorization information and cookies to remote server.
+3. <u>crossorigin="use-credentials"</u> – access allowed if the server sends back the header `Access-Control-Allow-Origin` with our origin and `Access-Control-Allow-Credentials: true`. Browser sends authorization information and cookies to remote server.
+
+We can choose between "anonymous" (no cookies sent, one server-side header needed) and "use-credentials" (sends cookies too, two server-side headers needed). If we don’t care about cookies, then "anonymous" is the way to go
+
+```js
+window.onerror = function(message, url, line, col, errorObj) {
+  alert(`${message}\n${url}, ${line}:${col}`);
+};
+<script crossorigin="anonymous" src="https://cors.javascript.info/article/onload-onerror/crossorigin/error.js"></script>
+// assuming that the server provides an Access-Control-Allow-Origin header, everything’s fine.
+// we will get full error report
+```
+
+
+
 ## Passed as Value vs passed as referance
 
 All primitive types are passed as values while all objects are passed as referance.

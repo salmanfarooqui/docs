@@ -862,11 +862,15 @@ this is because when JavaScript executed this code it searched for car property 
 
 <br>
 
-
-
-> The `__proto__` property of an object and the `Object.getPrototypeOf()` method are both ways to access the prototype of an object. 
+> The `__proto__` is considered outdated and somewhat deprecated (in browser-only part of the JavaScript standard).
 >
-> Because `__proto__` is simply a property of an object and was put there back in the day to access the prototype of an object. `__proto__` is now deprecated and there is a chance that certain JS engines don't support this property anymore. `Object.getPrototypeOf()` and `Object.setPrototypeOf()` are the function which now should be used in order to retrieve a prototype.
+> The modern methods are:
+>
+> - <u>[Object.create(proto, descriptors])</u> – creates an empty object with given proto as [[Prototype]] and optional property descriptors.
+> - <u>Object.getPrototypeOf(obj)</u> – returns the [[Prototype]] of obj.
+> - <u>Object.setPrototypeOf(obj, proto)</u> – sets the [[Prototype]] of obj to proto.
+>
+> These should be used instead of `__proto__`.
 >
 > ```js
 > // DON'T: Old method using __proto__ deprecated!
@@ -875,9 +879,6 @@ this is because when JavaScript executed this code it searched for car property 
 > // DO: Using the newer getPrototypeOf function
 > console.log(Object.getPrototypeOf(dog));
 > ```
-> **One difference is** that `__proto__` can be changed (a bad design practice though) while `getPrototypeOf` is a read only function.
-
-
 
 
 More info - [Prototypes in JavaScript](https://medium.com/better-programming/prototypes-in-javascript-5bba2990e04b) on medium
