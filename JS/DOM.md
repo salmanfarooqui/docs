@@ -662,6 +662,99 @@ The readystatechange event is an alternative mechanics of tracking the document 
 
 ### Timers
 
+We may decide to execute a function not right now, but at a certain time later. That’s called “scheduling a call”.
+
+There are two methods for it:  `setTimeout` and `setInterval`.  These methods are not a part of JavaScript specification. But most environments have the internal scheduler and provide these methods.
+
+
+
+**setTimeout**
+
+```javascript
+let timerId = setTimeout(func|code, [delay], [arg1], [arg2], ...)
+```
+
+<u>func|code</u> - Usually Function but a string of code is allowed too although not recommended.
+
+<u>delay</u> - The delay before run, in milliseconds. By default 0
+
+<u>arg1, arg2…</u> - Arguments for the function (not supported in IE9-)
+
+```javascript
+function sayHi(phrase, who) {
+  alert( phrase + ', ' + who );
+}
+
+setTimeout(sayHi, 1000, "Hello", "John"); // Hello, John
+```
+
+**There’s a special use case: `setTimeout(func, 0)`, or just `setTimeout(func)`**
+
+This schedules the execution of `func` as soon as possible. But the scheduler will invoke it only after the currently executing script is complete. So the function is scheduled to run “right after” the current script.
+
+```javascript
+setTimeout(() => alert("World"));
+alert("Hello");
+// outputs “Hello”, then immediately “World”
+```
+
+
+
+**setInterval**
+
+The setInterval method has the same syntax as setTimeout. But unlike setTimeout it runs the function not only once, but regularly after the given interval of time.
+
+There are two ways of running something regularly.. One is `setInterval`. The other one is a `nested setTimeout`
+
+```javascript
+// instead of: let timerId = setInterval(() => alert('tick'), 2000);
+
+let timerId = setTimeout(function tick() {
+  alert('tick');
+  timerId = setTimeout(tick, 2000); // (*)
+}, 2000);
+```
+
+The setTimeout above schedules the next call right at the end of the current one `(*)`.
+
+The **nested setTimeout is a more flexible method than setInterval**. This way the next call may be scheduled differently, depending on the results of the current one. For instance, we need to write a service that sends a request to the server every 5 seconds asking for data, but in case the server is overloaded, it should increase the interval to 10, 20, 40 seconds…
+
+```javascript
+let delay = 5000;
+let timerId = setTimeout(function request() {
+  ...send request...
+  if (request failed due to server overload) {
+    delay *= 2;   // increase the interval to the next run
+  }
+  timerId = setTimeout(request, delay);
+}, delay);
+```
+
+Also, **Nested setTimeout allows to set the delay between the executions more precisely than setInterval**
+
+```javascript
+// using setInterval
+let i = 1;
+setInterval(function() {
+  func(i++);
+}, 100);
+
+//using nested setTimeout
+let i = 1;
+setTimeout(function run() {
+  func(i++);
+  setTimeout(run, 100);
+}, 100);
+```
+
+![Scheduling_setTimeout_and_setInterval](https://docs.salmanfarooqui.com/JS/images/Scheduling_setTimeout_and_setInterval.jpg)
+
+The delay in setInterval code is normal, because the time taken by `func`'s execution “consumes” a part of the interval. **The nested setTimeout guarantees the fixed delay (here 100ms).**That’s because a new call is planned at the end of the previous one.
+
+
+
+**Cancelling** 
+
 We know setTimeout schedules another function to be called later, after a given number of milliseconds. Sometimes you need to cancel a function you have scheduled. This is done by storing the value returned by `setTimeout` and calling `clearTimeout` on it.
 
 
@@ -678,6 +771,12 @@ if (Math.random() < 0.5) { // 50% chance
 ```
 
 A similar set of functions, `setInterval` and `clearInterval`, are used to set timers that should *repeat* every *X* milliseconds.
+
+> Please note that all scheduling methods do not *guarantee* the exact delay.
+>
+> For example, the in-browser timer may slow down for a lot of reasons: The CPU is overloaded. The browser tab is in the background mode. The laptop is on battery.
+
+
 
 ### Debouncing
 
