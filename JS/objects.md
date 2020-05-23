@@ -862,6 +862,31 @@ this is because when JavaScript executed this code it searched for car property 
 
 <br>
 
+> Another way to look at the difference
+>
+> **`__proto__`**
+>
+> You can actually access the internal `[[Prototype]]` property of an object with `__proto__`. You can think of `[[Prototype]]` as the actual parent of the current object, in the inheritance hierarchy.
+>
+> 
+>
+> **`prototype`**
+>
+> This is a special property, when set on a (constructor) function object, used to establish the inheritance chain for instances created from the constructor. For example,
+>
+> ```js
+> function Foo() {}
+> Foo.prototype = {a: 1};
+> ```
+>
+> Now, when you create a new object of type `Foo`, the newly created object's internal `[[Prototype]]` property will refer the `Foo.prototype` object. You can confirm that like this
+>
+> ```js
+> console.assert((new Foo()).__proto__ === Foo.prototype);
+> ```
+
+<br>
+
 > The `__proto__` is considered outdated and somewhat deprecated (in browser-only part of the JavaScript standard).
 >
 > The modern methods are:
