@@ -182,6 +182,19 @@ try {
 // Error has occured!
 ```
 
+**Example**
+
+```js
+function isValidJSON(text) {
+  try {
+    JSON.parse(text);
+    return true;
+  } catch {
+    return false;
+  }
+}
+```
+
 
 
 ### try...catch works synchronously
@@ -233,8 +246,11 @@ JavaScript has many built-in constructors for standard errors: `Error`, `SyntaxE
 ```javascript
 let error = new Error(message);
 // or
-let error = new SyntaxError(message);
-let error = new ReferenceError(message);
+let error = new InternalError(message); // when an internal error in the JavaScript engine is thrown. E.g. "too much recursion".
+let error = new RangeError(message); // value is not in an allowed range
+let error = new ReferenceError(message); // want to refer to some variable that doesn’t exist
+let error = new SyntaxError(message);  // syntax of code is somehow invalid
+let error = new TypeError(message); // our value is not of a proper type
 ```
 
 For built-in errors, the `name` property is exactly the name of the constructor. And `message` is taken from the argument.
