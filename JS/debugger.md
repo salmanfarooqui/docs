@@ -279,6 +279,8 @@ try {
 
 The `throw` operator generates a `SyntaxError` with the given `message`, the same way as JavaScript would generate it itself. The execution of `try` immediately stops and the control flow jumps into `catch`.
 
+Read - [Custom Errors](https://javascript.info/custom-errors)
+
 
 
 ### Rethowing

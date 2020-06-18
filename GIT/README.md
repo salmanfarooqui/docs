@@ -46,6 +46,19 @@ your local repository consists of three \"trees\" maintained by git. the first o
 
 ## Git reset
 
+To reset back to previous commit -  `git reset --hard 0d1d7fc32`
+
+```js
+// This saves the modifications, then reapplies that patch after resetting.
+git stash
+git reset --hard 0d1d7fc32
+git stash pop
+```
+
+Then to push it to remote - `git push -f origin master`
+
+<br>
+
 (stage it --- means add it to the index --- using git add)
 
 If your master branch (currently checked out) is like this:
