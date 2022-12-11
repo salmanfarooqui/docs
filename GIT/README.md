@@ -2,13 +2,10 @@
 
 ### Step 1
 
-Create a new directory, open it and perform `git init`
+Create a new directory, open it and perform `git init` to create a new git repository. This will create a hidden .git folder inside your current folder.
 
-to create a new git repository. This will create a hidden .git folder inside your current folder.
-
-If you are starting by cloning a repository from github, then simply do, `git clone <url>`
-
-`git clone` first internally calls `git init` to create an empty git repository and then copy the data from the specified remote repository.
+If you are starting by cloning a repository from github, then simply do `git clone <url>` \
+git clone first internally calls `git init` to create an empty git repository and then copy the data from the specified remote repository.
 
 
 
