@@ -33,18 +33,18 @@ function Welcome(props) {
   return <h1>Hello, {props.name}</h1>;
 }
 
+const root = ReactDOM.createRoot(document.getElementById('root'));
 const element = <Welcome name="Sara" />;
-ReactDOM.render(
-  element,
-  document.getElementById('root')
-);
+root.render(element);
 ```
 
 ​	Let’s recap what happens in this example:
 
-- We call `ReactDOM.render()` with the `<Welcome name="Sara" />` element.
-- **React calls the `Welcome` component with `{name: 'Sara'}` as the props.**
+- We call `root.render()` with the `<Welcome name="Sara" />` element.
+- React calls the `Welcome` component with `{name: 'Sara'}` as the props.
 - Our `Welcome` component returns a `<h1>Hello, Sara</h1>` element as the result.
+- React DOM efficiently updates the DOM to match `<h1>Hello, Sara</h1>`.
+
 
 <br><br>
 
