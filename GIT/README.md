@@ -37,7 +37,9 @@ Now you are able to push your changes to the selected remote server
 ### Step 4
 
 `git log` to see the logs.
-To quit, just type `q`
+To quit, just type `q`  
+
+`git status` to know status of your files, whether commited or not.
 <br /><br />
 Simple commit process -\
 `git add .`\
