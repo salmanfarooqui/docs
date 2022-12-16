@@ -746,7 +746,18 @@ var props = { a: 1, b: 2};
 
 Using {...props} spreads each key in the object and passes it to Foo as an individual property.
 
-#### How it Works
+You can also pick specific props that your component will consume while passing all other props using the spread syntax.
+
+```js
+const Button = props => {
+  const { kind, ...other } = props;
+  const className = kind === "primary" ? "PrimaryButton" : "SecondaryButton";
+  return <button className={className} {...other} />;
+};
+```
+
+
+## HOC - How it Works
 
 Let’s imagine in your application you have an object that contains information on the current user who is authenticated on the system. You need some of your React components to be able to access this information, but rather than blindly making it accessible for every component you want to be more strict about which components receive the information.
 The way to solve this is to create a function that we can call with a React component. The function will then return a new React component that will render the given component but with an extra property which will give it access to the user information.
