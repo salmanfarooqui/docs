@@ -643,10 +643,103 @@ One major difference between Consumer and static context is the fact that using 
 > consumer - Using this component lets you subscribe to a context within a function component. Requires a function as a child. 
 
 
+**Updating Context from a Nested Component**
+
+It is often necessary to update the context from a component that is nested somewhere deeply in the component tree. In this case you can pass a function down through the context to allow consumers to update the context:
+
+```js
+// Make sure the shape of the default value passed to
+// createContext matches the shape that the consumers expect!
+export const ThemeContext = React.createContext({
+  theme: themes.dark,
+  toggleTheme: () => {},
+});
+```
+
+```js
+import {ThemeContext} from './theme-context';
+
+function ThemeTogglerButton() {
+  // The Theme Toggler Button receives not only the theme
+  // but also a toggleTheme function from the context
+  return (
+    <ThemeContext.Consumer>
+      {({theme, toggleTheme}) => (
+        <button
+          onClick={toggleTheme}
+          style={{backgroundColor: theme.background}}>
+          Toggle Theme
+        </button>
+      )}
+    </ThemeContext.Consumer>
+  );
+}
+
+export default ThemeTogglerButton;
+```
+
+**Consuming Multiple Contexts**
+
+To keep context re-rendering fast, React needs to make each context consumer a separate node in the tree.
+
+```js
+// Theme context, default to light theme
+const ThemeContext = React.createContext('light');
+
+// Signed-in user context
+const UserContext = React.createContext({
+  name: 'Guest',
+});
+
+class App extends React.Component {
+  render() {
+    const {signedInUser, theme} = this.props;
+
+    // App component that provides initial context values
+    return (
+      <ThemeContext.Provider value={theme}>
+        <UserContext.Provider value={signedInUser}>
+          <Layout />
+        </UserContext.Provider>
+      </ThemeContext.Provider>
+    );
+  }
+}
+
+function Layout() {
+  return (
+    <div>
+      <Sidebar />
+      <Content />
+    </div>
+  );
+}
+
+// A component may consume multiple contexts
+function Content() {
+  return (
+    <ThemeContext.Consumer>
+      {theme => (
+        <UserContext.Consumer>
+          {user => (
+            <ProfilePage user={user} theme={theme} />
+          )}
+        </UserContext.Consumer>
+      )}
+    </ThemeContext.Consumer>
+  );
+}
+```
+
 
 ## Error Boundaries
 
 A JavaScript error in a part of the UI shouldn’t break the whole app.  Error boundaries are React components that **catch JavaScript errors anywhere in their child component tree, log those errors, and display a fallback UI** instead of the component tree that crashed.
+
+Error boundaries do not catch errors for:
+
+1. Event handlers (learn more)
+2. Asynchronous code (e.g. setTimeout or requestAnimationFrame callbacks)
 
 A class component becomes an error boundary if it defines either (or both) of the lifecycle methods [`static getDerivedStateFromError()`](https://reactjs.org/docs/react-component.html#static-getderivedstatefromerror) or [`componentDidCatch()`](https://reactjs.org/docs/react-component.html#componentdidcatch). Use `static getDerivedStateFromError()` to render a fallback UI after an error has been thrown. Use `componentDidCatch()` to log error information.
 
@@ -691,8 +784,6 @@ Error boundaries work like a JavaScript `catch {}` block, but for components. On
 Note that error boundaries only catch errors in the components below them in the tree. An error boundary can’t catch an error within itself. If an error boundary fails trying to render the error message, the error will propagate to the closest error boundary above it.
 
 You may wrap top-level route components to display a “Something went wrong” message to the user, just like server-side frameworks often handle crashes. You may also wrap individual widgets in an error boundary to protect them from crashing the rest of the application.
-
-Error boundaries do not catch errors inside event handlers. Unlike the render method and lifecycle methods, the event handlers don’t happen during rendering. So if they throw, React still knows what to display on the screen. If you need to catch an error inside event handler, use the regular JavaScript `try` / `catch` statement.
 
 
 
