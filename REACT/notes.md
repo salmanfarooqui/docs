@@ -244,7 +244,59 @@ The problem with this syntax is that a different callback is created each time t
 
     In **both cases, the `e` argument representing the React event will be passed as a second argument after the ID**. With an arrow function, we have to pass it explicitly, but with `bind` any further arguments are automatically forwarded.
 
-    <br><br>
+
+**Currying event handler function**
+
+```js
+import React from 'react';
+
+function MyComponent() {
+    handleClick(e, count) {
+        console.log(e, count)
+    }
+
+    render() {
+        return(
+            <div>
+                <a onClick={(e) => handleClick(e, 1)}>Clicked once</a>
+                <a onClick={(e) => handleClick(e, 2)}>Clicked twice</a>
+                <a onClick={(e) => handleClick(e, 3)}>Clicked thrice</a>
+            </div>
+        );
+    }
+}
+```
+
+Notice, we pass in the event e and count as the arguments to this handler. So, if you’re using this at multiple places, this kind of implementation gets quite messy since we are using the arrow function and passing in the event every time we are calling the handler.
+
+Instead we can do this -
+
+```js
+function MyComponent() {
+    handleClick(count) {
+        return (e) => console.log(e, count);
+    }
+
+    render() {
+        return(
+            <div>
+                <a onClick={handleClick(1)}>Clicked once</a>
+                <a onClick={handleClick(2)}>Clicked twice</a>
+                <a onClick={handleClick(3)}>Clicked thrice</a>
+            </div>
+        );
+    }
+}
+```
+
+when the component renders, onhandleClick will be called immediately.
+```js
+<a onClick={handleClick(1)}> will end up returning <a onClick={(e) => console.log(e, count}>
+```
+
+As you can tell, the `handleClick is now a curried function that returns another function`. This function handles the event which is passed by default to this inner function. So, we don’t need to explicitly pass in the event when calling the handler.
+
+<br><br>
 
 11. In rare cases you might want a component to hide itself even though it was rendered by another component. To do this return `null` instead of its render output.
 
