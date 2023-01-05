@@ -1330,6 +1330,249 @@ Even though a portal can be anywhere in the DOM tree, it behaves like a normal R
 For example, if you render a `<Modal />` component, the parent can capture its events regardless of whether it’s implemented using portals.
 
 
+## HOOKS
+Let's you use state and other React features without writing a class
+
+Hooks are JavaScript functions, but they impose two additional rules:
+* `Only call Hooks at the top level`. Don’t call Hooks inside loops, conditions, or nested functions.
+* Only call Hooks from React function components. `Don’t call Hooks from regular JavaScript functions`. (You can call Hooks from your own custom Hooks)
+
+
+### useState
+
+useState lets you use local state within a function component.
+
+```js
+import React, { useState } from 'react';
+
+const [state, stateUpdaterFunction] = useState(initialStateValue)
+```
+
+When we declare a state variable with useState, it returns a pair — an array with two items. The first item is the current value, and the second is a function that lets us update it. Using [0] and [1] to access them is a bit confusing because they have a specific meaning. This is why we use array destructuring instead.
+
+Equivalent to -
+```js
+const something = useState(initialStateValue);
+var state = something[0];
+var stateUpdaterFunction = something[1];
+```
+
+
+**Difference between this.state and state hook** 
+
+- Unlike this.state, `the state here doesn’t have to be an object` — although it can be if you want.
+
+- Unlike this.setState in a class, updating a state variable using hook always `replaces it instead of merging it`. To merge, you can pass a function that receives the previous state -
+```js
+const [user, setUser] = useState(
+    { name: 'John', email: 'john@example.com', age: 25 }
+  );
+  setUser((prevState) => ({ ...prevState, name: 'Harry' }));
+  ```
+
+
+useState can be used once or multiple times within a single component.
+
+State could also be initialised from a function
+
+```js
+const [token] = useState(() => {
+    let token = window.localStorage.getItem("my-token");
+    return token || "default#-token#"
+  })
+  ```
+
+If the `new state is computed using the previous state, you can pass a function to setState`. The function will receive the previous value, and return an updated value.
+
+```js
+const [count, setCount] = useState(initialCount);
+<button onClick={() => setCount(prevCount => prevCount + 1)}>+</button>
+```
+
+
+> Unlike the setState method found in class components, useState does not automatically merge update objects. You can replicate this behaviour by combining the function updater form with object spread syntax
+```js
+const [state, setState] = useState({});
+setState(prevState => {
+  // Object.assign would also work
+  return {...prevState, ...updatedValues};
+});
+```
+Another option is useReducer, which is more suited for managing state objects that contain multiple sub-values.
+
+
+### useEffect
+
+You’ve likely performed data fetching, subscriptions, or manually changing the DOM from React components before. We call these operations “side effects” (or “effects” for short) because they can affect other components and can’t be done during rendering.
+
+useEffect accepts a function which can perform any side effects. It serves the same purpose as componentDidMount, 
+componentDidUpdate, and componentWillUnmount in React classes, but unified into a single API.
+
+```js
+useEffect(effectFunction, arrayDependencies)
+```
+
+- Without arrayDependencies, React runs the effects after every render — including the first render.
+
+- With empty array [] as dependency, effect will run only once.
+
+- If you want to skip applying an effect if certain values haven’t changed between re-renders
+```js
+useEffect(() => {
+  document.title = `You clicked ${count} times`;
+}, [count]); // Only re-run the effect if count changes
+```
+
+To `cleanup an effect, return a function from within the effect` function passed to useEffect
+
+```js
+  useEffect(() => {
+    const clicked = () => console.log('window clicked')
+    window.addEventListener('click', clicked)
+
+    // return a clean-up function
+    return () => {
+      window.removeEventListener('click', clicked)
+    }
+  }, [])
+```
+
+Every effect may return a function that cleans up after it. This lets us keep the logic for adding and removing subscriptions close to each other.
+Cleans up effects from the previous render before running the effects next time.
+
+
+**Skipping Effects**
+
+In some cases, cleaning up or applying the effect after every render might create a performance problem. In class components, we can solve this by writing an extra comparison with prevProps or prevState inside componentDidUpdate:
+
+```js
+componentDidUpdate(prevProps, prevState) {
+  if (prevState.count !== this.state.count) {
+    document.title = `You clicked ${this.state.count} times`;
+  }
+}
+```
+
+You can tell React to skip applying an effect if certain values haven’t changed between re-renders. To do so, pass an array as an optional second argument to useEffect
+
+```js
+useEffect(() => {
+  document.title = `You clicked ${count} times`;
+}, [count]); // Only re-run the effect if count changes
+```
+
+If you want to run an effect only once, you can pass an empty array ([]) as a second argument. This tells React that your effect doesn’t depend on any values from props or state, so it never needs to re-run. Without an array dependency, the effect function will be run after every single render.
+
+
+**Use Multiple Effects to Separate Concerns**
+class lifecycle methods often contain unrelated logic. Logic gets split between componentDidMount, componentDidUpdate and others.
+Hooks let us split the code based on what it is doing rather than a lifecycle method name.
+
+
+> Unlike componentDidMount or componentDidUpdate, effects scheduled with useEffect `don’t block the browser from updating the screen`. This makes your app feel more responsive. The majority of effects don’t need to happen synchronously. In the uncommon cases where they do (such as measuring the layout), there is a separate useLayoutEffect Hook with an API identical to useEffect.
+
+
+### Custom Hooks
+
+Sometimes, we want to reuse some stateful logic between components. Traditionally, there were two popular solutions to this problem: *higher-order components* and *render props*. Custom Hooks let you do this, but without adding more components to your tree.
+
+```js
+import React, { useState, useEffect } from 'react';
+
+function useFriendStatus(friendID) {
+  const [isOnline, setIsOnline] = useState(null);
+
+  function handleStatusChange(status) {
+    setIsOnline(status.isOnline);
+  }
+
+  useEffect(() => {
+    ChatAPI.subscribeToFriendStatus(friendID, handleStatusChange);
+    return () => {
+      ChatAPI.unsubscribeFromFriendStatus(friendID, handleStatusChange);
+    };
+  });
+
+  return isOnline;
+}
+```
+
+Now we can use it from both components:
+
+```js
+function FriendStatus(props) {
+  const isOnline = useFriendStatus(props.friend.id);
+  if (isOnline === null) {
+    return 'Loading...';
+  }
+  return isOnline ? 'Online' : 'Offline';
+}
+
+function FriendListItem(props) {
+  const isOnline = useFriendStatus(props.friend.id);
+return (
+)
+}
+```
+
+The state of each component is completely independent. Hooks are a way to reuse stateful logic, not state itself. In fact, `each call to a Hook has a completely isolated state` — so you can even use the same custom Hook twice in one component.
+
+Custom Hooks are more of a convention than a feature. If a function’s name starts with ”use” and it calls other Hooks, we say it is a custom Hook.
+
+Since Hooks are functions, `we can pass information between them`.
+
+
+
+### Hooks Tips
+
+**How to get the previous props or state?**
+
+Sometimes, you need previous props to clean up an effect. For example, you might have an effect that subscribes to a socket based on the userId prop. If the userId prop changes, you want to unsubscribe from the previous userId and subscribe to the next one. 
+
+```js
+useEffect(() => {
+  ChatAPI.subscribeToSocket(props.userId);
+  return () => ChatAPI.unsubscribeFromSocket(props.userId);
+}, [props.userId]);
+```
+
+In the above example, if userId changes from 3 to 4, ChatAPI.unsubscribeFromSocket(3) will run first, and then ChatAPI.subscribeToSocket(4) will run. There is no need to get “previous” userId because the cleanup function will capture it in a closure.
+
+
+**Can I run an effect only on updates?**
+If we want to restrict useEffect to run only when the component mounts, we can add second parameter of useEffect with [].
+```js
+useEffect(() => {
+  // ...
+}, []);
+```
+
+If you want the useEffect to run only on updates and not on initial mount
+
+you can make `use of useRef to keep track of initialMount` with useEffect without the second parameter.
+
+```js
+const isInitialMount = useRef(true);
+useEffect(() => {
+  if (isInitialMount.current) {
+     isInitialMount.current = false;
+  } else {
+      // Your useEffect code here to be run on update
+  }
+});
+```
+
+
+### Hook Lifecycle Comparison
+How do lifecycle methods correspond to Hooks?
+* constructor: Function components don’t need a constructor. You can initialize the state in the useState call. If computing the initial state is expensive, you can pass a function to useState.
+* getDerivedStateFromProps: Schedule an update while rendering instead.
+* shouldComponentUpdate: See React.memo below.
+* render: This is the function component body itself.
+* componentDidMount, componentDidUpdate, componentWillUnmount: The useEffect Hook can express all combinations of these (including less common cases).
+* getSnapshotBeforeUpdate, componentDidCatch and getDerivedStateFromError: There are no Hook equivalents for these methods yet, but they will be added soon.
+
+
 
 ## React lifecycle Methods
 
