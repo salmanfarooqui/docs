@@ -1330,7 +1330,7 @@ Even though a portal can be anywhere in the DOM tree, it behaves like a normal R
 For example, if you render a `<Modal />` component, the parent can capture its events regardless of whether it’s implemented using portals.
 
 
-## HOOKS
+## Hooks
 Let's you use state and other React features without writing a class
 
 Hooks are JavaScript functions, but they impose two additional rules:
@@ -1540,6 +1540,7 @@ In the above example, if userId changes from 3 to 4, ChatAPI.unsubscribeFr
 
 
 **Can I run an effect only on updates?**
+
 If we want to restrict useEffect to run only when the component mounts, we can add second parameter of useEffect with [].
 ```js
 useEffect(() => {
