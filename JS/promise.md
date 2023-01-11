@@ -307,6 +307,59 @@ async function msg(x) {
 msg('Hello'); // HELLO
 msg(34); // Ohh no: val.toUpperCase is not a function
 ```
+
+
+
+
+
+## Fetch
+
+A typical fetch request consists of two await calls 
+```js
+let response = await fetch(url, options); // resolves with response headers
+let result = await response.json(); // read body as json
+```
+Or, without await
+```js
+fetch(url, options)
+  .then(response => response.json())
+  .then(result => /* process result */)
+```
+
+Here options is optional parameters: method, headers etc.
+Without options, this is a simple GET request, downloading the contents of the url.
+Here’s the full list of all possible fetch options with their default values (alternatives in comments):
+
+```js
+let promise = fetch(url, {
+  method: "GET", // POST, PUT, DELETE, etc.
+  headers: {
+    // the content type header value is usually auto-set
+    // depending on the request body
+    "Content-Type": "text/plain;charset=UTF-8"
+  },
+  body: undefined, // string, FormData, Blob, BufferSource, or URLSearchParams
+  referrer: "about:client", // or "" to send no Referer header,
+  // or an url from the current origin
+  referrerPolicy: "strict-origin-when-cross-origin", // no-referrer-when-downgrade, no-referrer, origin, same-origin...
+  mode: "cors", // same-origin, no-cors
+  credentials: "same-origin", // omit, include
+  cache: "default", // no-store, reload, no-cache, force-cache, or only-if-cached
+  redirect: "follow", // manual, error
+  integrity: "", // a hash, like "sha256-abcdef1234567890"
+  keepalive: false, // true
+  signal: undefined, // AbortController to abort request
+  window: window // null
+});
+```
+
+Getting a response is usually a two-stage process.
+
+- First, the promise, returned by fetch, resolves with an object of the built-in Response class as soon as the server responds with headers. At this stage we can check HTTP status, to see whether it is successful or not, check headers, but don’t have the body yet.
+
+- Second, to get the response body, we need to use an additional method call. Response provides multiple promise-based methods to access the body in various formats - response.text(), response.json(), response.blob() etc.
+
+
 <br>
 
 [![Promises and Async/await ](https://img.youtube.com/vi/vn3tm0quoqE/0.jpg)](https://www.youtube.com/watch?v=vn3tm0quoqE)
