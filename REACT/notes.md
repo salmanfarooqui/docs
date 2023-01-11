@@ -502,6 +502,39 @@ Children passed to a custom component can be anything, as long as that component
 
 
 
+## Environment Variables
+
+Environment Variables let you `store globally scoped values to the environment your code is running in`, making them available throughout the codebase. 
+They enable you to -
+- Decouple configurations from your code and limit the need to modify and re-deploy an application when configuration data changes.
+- Set different configurations for different environments. For example, you could enable debugging logging and disable caching when in development — then enable caching and disable debug logging in production.
+
+### For React
+
+If you use Create React App (CRA) to set up your React application, it uses the `dotenv library` to read environment variables found in any .env file and loads them into the `process.env` object. 
+
+
+React enforces EVs to be `prefixed with the word REACT_APP_ ` to enable the React engine to identify them.
+```js
+// within a .env file
+REACT_APP_YOUR_API_KEY = abxyz
+```
+React then loads the variables into process.env — a global object injected by Node.js at runtime that represents the state of the environment in which your app is running. Since environment variables have global scope in this environment, you can access them through it. Like this - `process.env.REACT_APP_YOUR_API_KEY`
+
+As your application grows, you may adopt different third-party APIs for different environments to prevent interference. You can create different .env files for each of these environments. 
+
+The main .env file usually contains all common/shared environment variables while other .env files with different suffixes (for example, .env.development, .env.production, .env.staging) contain variables for other environments.
+At runtime, depending on the current environment your app is running in, dotenv loads the correct environment variables from the corresponding .env file and replaces the reference to each environment variable name within the codebase with its current value.
+
+> The standard naming convention for EVs can consist solely of uppercase letters, digits, and underscores (_) but can’t begin with a digit.
+
+> Avoid adding strings or space characters. By default, the values assigned to environment variables are enclosed in quotes when compiled at build time. So, if quotes are already there, it will become double quotes. This is a poor practice.
+
+Remember to add .env files to .gitignore and restart the server every time any value changes inside .env files.
+
+
+
+
 ## Export
 
 ### Default Export
