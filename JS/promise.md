@@ -359,6 +359,19 @@ Getting a response is usually a two-stage process.
 
 - Second, to get the response body, we need to use an additional method call. Response provides multiple promise-based methods to access the body in various formats - response.text(), response.json(), response.blob() etc.
 
+### fetch with async/await
+async/await syntax fits great with fetch() because it simplifies the work with promises.
+```js
+async function fetchMovies() {
+  const response = await fetch('/movies');
+  // waits until the request completes...
+  console.log(response);
+}
+```
+fetchMovies() is an asynchronous function since it's marked with the async keyword.
+await fetch('/movies') starts an HTTP request to '/movies' URL. Because the await keyword is present, `the asynchronous function is paused until the request completes.`
+
+When the request completes, response is assigned with the response object of the request.
 
 <br>
 
