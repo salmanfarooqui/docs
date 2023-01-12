@@ -1557,6 +1557,50 @@ Hooks let us split the code based on what it is doing rather than a lifecycle m
 > Unlike componentDidMount or componentDidUpdate, effects scheduled with useEffect `don’t block the browser from updating the screen`. This makes your app feel more responsive. The majority of effects don’t need to happen synchronously. In the uncommon cases where they do (such as measuring the layout), there is a separate useLayoutEffect Hook with an API identical to useEffect.
 
 
+
+### useContext
+
+```js
+const value = useContext(MyContext);
+```
+
+Accepts a context object (the value returned from React.createContext) and returns the current context value for that context. The current context value is determined by the `value` prop of the nearest `<MyContext.Provider>`. When the nearest <MyContext.Provider> above the component updates, this Hook will trigger a rerender. If re-rendering the component is expensive, you can optimise it by using memoization.
+
+> Don’t forget that the argument to useContext must be the context object itself - 'useContext(MyContext)' and not useContext(MyContext.Consumer)
+
+> If you’re familiar with the context API before Hooks, useContext(MyContext) is equivalent to static contextType = MyContext in a class, or to <MyContext.Consumer>.  useContext(MyContext) only lets you read the context and subscribe to its changes. You `still need a <MyContext.Provider> above in the tree to provide the value` for this context.
+
+```js
+const ThemeContext = React.createContext(themes.light);
+
+function App() {
+  return (
+    <ThemeContext.Provider value={themes.dark}>
+      <Toolbar />
+    </ThemeContext.Provider>
+  );
+}
+
+function Toolbar(props) {
+  return (
+    <div>
+      <ThemedButton />
+    </div>
+  );
+}
+
+function ThemedButton() {
+  const theme = useContext(ThemeContext);
+  return (
+    <button style={{ background: theme.background, color: theme.foreground }}>
+      I am styled by theme context!
+    </button>
+  );
+}
+```
+
+
+
 ### Custom Hooks
 
 Sometimes, we want to reuse some stateful logic between components. Traditionally, there were two popular solutions to this problem: *higher-order components* and *render props*. Custom Hooks let you do this, but without adding more components to your tree.
