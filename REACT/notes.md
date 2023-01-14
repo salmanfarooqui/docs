@@ -1601,6 +1601,92 @@ function ThemedButton() {
 
 
 
+### useReducer
+
+It is an alternative to useState.
+```js
+const [state, dispatch] = useReducer(reducer, initialArg, init);
+```
+
+useReducer is usually preferable to useState when you have complex state logic that `involves multiple sub-values` or when the `next state depends on the previous one`. useReducer also lets you optimize performance for components that trigger deep updates because you can pass dispatch down instead of callbacks.
+
+reducer function is a pure function that accepts state and action as parameters and returns an updated state. 
+
+```js
+const reducer = (state, action) => {
+  // logic to update state with value from action
+  return updatedState
+}
+```
+
+The action parameter helps us define how to change our state.
+
+
+```js
+const initialState = {count: 0};
+
+function reducer(state, action) {
+  switch (action.type) {
+    case 'increment':
+      return {count: state.count + 1};
+    case 'decrement':
+      return {count: state.count - 1};
+    default:
+      throw new Error();
+  }
+}
+
+function Counter() {
+  const [state, dispatch] = useReducer(reducer, initialState);
+  return (
+    <>
+      Count: {state.count}
+      <button onClick={() => dispatch({type: 'decrement'})}>-</button>
+      <button onClick={() => dispatch({type: 'increment'})}>+</button>
+    </>
+  );
+}
+```
+
+You can also create the initial state lazily. To do this, you can pass an init function as the third argument. The `initial state will be set to init(initialArg)`.
+It lets you extract the logic for calculating the initial state outside the reducer. This is also handy for resetting the state later in response to an action.
+
+```js
+function init(initialCount) {
+  return {count: initialCount};
+}
+
+function reducer(state, action) {
+  switch (action.type) {
+    case 'increment':
+      return {count: state.count + 1};
+    case 'decrement':
+      return {count: state.count - 1};
+    case 'reset':
+      return init(action.payload);
+    default:
+      throw new Error();
+  }
+}
+
+function Counter({initialCount}) {
+  const [state, dispatch] = useReducer(reducer, initialCount, init);
+  return (
+    <>
+      Count: {state.count}
+      <button
+        onClick={() => dispatch({type: 'reset', payload: initialCount})}>
+        Reset
+      </button>
+      <button onClick={() => dispatch({type: 'decrement'})}>-</button>
+      <button onClick={() => dispatch({type: 'increment'})}>+</button>
+    </>
+  );
+}
+```
+
+
+
 ### Custom Hooks
 
 Sometimes, we want to reuse some stateful logic between components. Traditionally, there were two popular solutions to this problem: *higher-order components* and *render props*. Custom Hooks let you do this, but without adding more components to your tree.
