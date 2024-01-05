@@ -179,6 +179,11 @@ When you do `git pull` (what I consider as evil, anyone else?), it automatically
 
 ## How to
 
+### Force "git pull" to overwrite local files
+
+`git fetch --all`
+
+`git reset --hard origin/master`
 
 
 ### Undo files changes. Still not staged(git add)
